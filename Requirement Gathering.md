@@ -1,7 +1,7 @@
 Wine App
 phonegap?
 
-seperate wine truth database
+separate wine truth database
 - find
 - save
 - info
@@ -22,3 +22,7 @@ For next week
 - others: 
  - Use cases
 
+Todo:
+ - open a variety of wine managers
+ - try to add a wine, search wines, et al
+ - comment on features. what works? what sucks? 
