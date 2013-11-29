@@ -1,4 +1,4 @@
-deps:
+install:
 	pip install -r deps
 
 run:
@@ -7,5 +7,5 @@ run:
 test:
 	python `which nosetests`
 
-pep8:
+lint:
 	pep8
