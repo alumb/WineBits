@@ -19,16 +19,16 @@ class SearchHandler(webapp2.RequestHandler):
 
 class VintnerBaseHandler(webapp2.RequestHandler):
     """
-    GET /vintner : a search interface for vintners
+    GET /vintner : fetch a set of vintners
     POST /vintner : create a vintner
     """
 
     def get(self):
         """
         /vintner?country=Canada
-        /vintner?name=Bla
+        /vintner?name=Black Hills Estate
         """
-        self.response.write("Search Interface Goes Here")
+        self.response.write("Vintner List Interface Goes Here")
 
     def post(self):
         post = self.request.POST
@@ -51,8 +51,11 @@ class VintnerHandler(webapp2.RequestHandler):
 
     def get(self, vintner_id):
         vintner_key = ndb.Key(Vintner, int(vintner_id))
-
         vintner = vintner_key.get()
+        if not vintner:
+            self.response.status = "404 Not Found"
+            return
+
         response_obj = vintner.to_dict()
         response_obj['key'] = vintner_key.id()
 
@@ -62,6 +65,11 @@ class VintnerHandler(webapp2.RequestHandler):
             self.response.write( json.dumps(response_obj, indent=2 ))
         else:
             self.response.write( json.dumps(response_obj) )
+
+    def post(self, vintner_id):
+        vintner_key = ndb.Key(Vintner, int(vintner_id))
+        vintner = vintner_key.get()
+        pass
 
 class VintnerWineBaseHandler(webapp2.RequestHandler):
     def get(self, vintner_id):
@@ -83,5 +91,5 @@ routes = [
             (r'/vintner', VintnerBaseHandler),
             (r'/vintner/(\d+)', VintnerHandler),
             (r'/vintner/(\d+)/wine', VintnerWineBaseHandler),
-            (r'/vintner/(\d+)/wine/(\d+)' VintnerWineHandler)
+            (r'/vintner/(\d+)/wine/(\d+)', VintnerWineHandler)
         ]

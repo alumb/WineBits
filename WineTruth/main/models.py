@@ -16,7 +16,7 @@ class PostError(Exception):
 class Vintner(ndb.Model):
     name = ndb.StringProperty(required=True)
     slug = ndb.ComputedProperty(lambda self: self.autoslug())
-    verified = ndb.KeyProperty(kind=VerifiedToken)
+    verified = ndb.KeyProperty(kind=VerifiedToken, indexed=False)
 
     country = ndb.StringProperty(choices=regions.countries)
     region = ndb.StringProperty(choices=regions.regions)
@@ -26,9 +26,9 @@ class Vintner(ndb.Model):
     location_fuzzy = ndb.StringProperty(indexed=False)
 
     addresses = ndb.TextProperty(repeated=True, indexed=False)
-    geopts = ndb.GeoPtProperty(repeated=True)
+    geopts = ndb.GeoPtProperty(repeated=True, indexed=False)
 
-    website = ndb.StringProperty()
+    website = ndb.StringProperty(indexed=False)
 
     def create(self, post):
         if not 'name' in post:
