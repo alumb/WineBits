@@ -1,7 +1,7 @@
-import webapp2
 import os
 
 import views
+from stubs import debug, webapp2
 
 #try:
 #    from google.appengine.api import channel
@@ -11,8 +11,6 @@ import views
 #def application(environ, start_response):
 #    start_response('200 OK', [('Content-Type', 'application/json')])
 #    return [json.dumps(channel.create_channel("hobo-fight") )]
-
-debug=os.environ["DEBUG"]
 
 if debug:
     print "Debug mode enabled, bitches."

@@ -4,10 +4,7 @@ import regions
 import os
 import json
 
-import webapp2
-from google.appengine.ext import ndb
-
-debug=os.environ["DEBUG"]
+from stubs import webapp2, ndb, debug
 
 class SearchHandler(webapp2.RequestHandler):
     """
@@ -53,6 +50,7 @@ class VintnerHandler(webapp2.RequestHandler):
         vintner_key = ndb.Key(Vintner, int(vintner_id))
         vintner = vintner_key.get()
         if not vintner:
+            self.response.write("404 Not Found")
             self.response.status = "404 Not Found"
             return
 

@@ -6,6 +6,7 @@ threadsafe: true
 
 env_variables:
   DEBUG: True
+  GOOGLE: True
 
 handlers:
 - url: /static
