@@ -10,4 +10,3 @@ types = [
     "Sparkling White",
     "Fortified Red",
     "Fortified White"]
-
