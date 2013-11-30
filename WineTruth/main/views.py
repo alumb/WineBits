@@ -17,7 +17,7 @@ class MyHandler(webapp2.RequestHandler):
                     object_[key] = value
                 del object_['json']
             if isinstance(model, Vintner):
-                object_['link'] = "/vintner/%d" % model.key.id()
+                object_['link'] = "/vintner/%s" % str(model.key.id())
             return object_
         except AttributeError as e:
             return model
