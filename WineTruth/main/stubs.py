@@ -35,6 +35,18 @@ else:
             def to_dict(self, *args, **kwargs):
                 return vars(self)
             pass
+        class Key(object):
+            thing_to_get = None
+            def __init__(self, *args):
+                self._id = "-".join([str(x) for x in args])
+                pass
+            def id(self):
+                return self._id
+            def get(self, *args, **kwargs):
+                return ndb.Key.thing_to_get
+            @classmethod
+            def load_get(cls, thing):
+                cls.thing_to_get = thing
         class StringProperty:
             def __init__(self, *args, **kwargs):
                 pass
@@ -128,12 +140,24 @@ else:
 if google_is_here:
     import webapp2
 else:
+    class FakeRequest(object):
+        def __init__(self, *args, **kwargs):
+            self.POST = {}
+
+    class FakeResponse(object):
+        def __init__(self, *args, **kwargs):
+            self.content_type = None
+            self.last_write = None
+        def write(self, thing):
+            self.last_write = thing
+
     class webapp2(object):
         def __init__(self, *args, **kwargs):
             pass
         class RequestHandler(object):
             def __init__(self, *args, **kwargs):
-                pass
+                self.request = FakeRequest()
+                self.response = FakeResponse()
         class WSGIApplication(object):
             def __init__(self, *args, **kwargs):
                 pass
