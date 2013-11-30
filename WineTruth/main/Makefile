@@ -9,3 +9,6 @@ test:
 
 lint:
 	pep8
+
+todo:
+	ack-grep 'TODO' -i --nomake
