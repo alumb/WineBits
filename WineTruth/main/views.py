@@ -7,17 +7,110 @@ import json
 from stubs import webapp2, ndb, debug
 
 
+def get_url(model):
+    """
+        >>> v = Vintner()
+        >>> key = v.create({'name':'Winery'})
+        >>> get_url(v)
+        '/vintner/stub-key'
+
+        >>> w = Wine(parent=key)
+        >>> key = w.create({'winetype':'Red', 'year':'2010'}, v)
+        >>> get_url(w)
+        '/vintner/stub-key/wine/stub-key'
+    """
+    if isinstance(model, Vintner):
+        return "/vintner/%s" % str(model.key.id())
+    if isinstance(model, Wine):
+        parent_key = model.key.parent()
+        return "/vintner/%s/wine/%s" % (str(parent_key.id()), str(model.key.id()))
+    return None
+
+
+def add_links(dict_):
+    """
+        Adds a key with the location's URL to the dict
+        >>> add_links({'location':'blerg' })
+        {...'vintner_location': '/vintner?location=blerg'...}
+
+        Doesn't remove the original fields from the dict
+        >>> add_links({'location':'blerg' })
+        {...'location': 'blerg'...}
+
+        >>> add_links({'location_fuzzy':'blerg'})
+        {...'vintner_location_fuzzy': '/vintner?location_fuzzy=blerg'...}
+
+        >>> add_links({'country':'Canada'})
+        {...'vintner_country': '/vintner?country=Canada'...}
+
+        >>> add_links({'country':'Canada', 'region':'British Columbia'})
+        {...'vintner_region': '/vintner?region=British Columbia'...}
+
+        >>> add_links({'country':'Canada', 'region':'British Columbia'})
+        {...'region_subregions': '/country/Canada/British Columbia'...}
+
+        >>> add_links({'subregion':'Okanagan'})
+        {...'vintner_subregion': '/vintner?subregion=Okanagan'...}
+
+    """
+    if 'location' in dict_:
+        location = dict_['location']
+        dict_['vintner_location'] = "/vintner?location=%s" % location
+    if 'location_fuzzy' in dict_:
+        location = dict_['location_fuzzy']
+        dict_['vintner_location_fuzzy'] = "/vintner?location_fuzzy=%s" % location
+    if 'country' in dict_:
+        country = dict_['country']
+        dict_['vintner_country'] = "/vintner?country=%s" % country
+        dict_['country_regions'] = "/country/%s" % country
+    if 'region' in dict_ and 'country' in dict_:
+        region = dict_['region']
+        country = dict_['country']
+        dict_['vintner_region'] = "/vintner?region=%s" % region
+        dict_['region_subregions'] = "/country/%s/%s" % (country, region)
+    if 'subregion' in dict_:
+        subregion = dict_['subregion']
+        dict_['vintner_subregion'] = "/vintner?subregion=%s" % subregion
+    return dict_
+
+
 class MyHandler(webapp2.RequestHandler):
     @staticmethod
     def json(model):
+        """
+        Converts Models into dicts
+        >>> v = Vintner()
+        >>> key = v.create({'name':'Winery'})
+        >>> MyHandler.json(v)
+        {...'name': 'Winery'...}
+
+        Adds Model links
+        >>> MyHandler.json(v)
+        {...'url': '/vintner/stub-key'...}
+
+        Flattens json elements
+        >>> MyHandler.json({'json':{'thing':'awesome'}})
+        {...'thing': 'awesome'...}
+
+        Adds dict links
+        >>> MyHandler.json({'country':'Canada'})
+        {...'vintner_country': '/vintner?country=Canada'...}
+        >>> MyHandler.json({'country':'Canada'})
+        {...'country_regions': '/country/Canada'...}
+        """
         try:
-            object_ = model.to_dict()
+            url = get_url(model)
+            if not isinstance(model, dict):
+                object_ = model.to_dict()
+            else:
+                object_ = model
             if object_ and 'json' in object_ and object_['json']:
-                for key, value in object_['json']:
+                for key, value in object_['json'].iteritems():
                     object_[key] = value
                 del object_['json']
-            if isinstance(model, Vintner):
-                object_['link'] = "/vintner/%s" % str(model.key.id())
+            object_ = add_links(object_)
+            if url:
+                object_['url'] = url
             return object_
         except AttributeError as e:
             return model
@@ -26,6 +119,7 @@ class MyHandler(webapp2.RequestHandler):
         """
         Return object_ as JSON, with 'application/json' type.
         Strip out any 'json' field
+
         """
         if type(model) != list:
             object_ = MyHandler.json(model)
@@ -43,14 +137,6 @@ class LocationHandler(MyHandler):
     GET /location : an exhaustive list of every location
     GET /location?fuzzy=true : every location_fuzzy
     """
-    @staticmethod
-    def vintner_link(location):
-        return "/vintner?location=%s" % location
-
-    @staticmethod
-    def fuzzy_vintner_link(location):
-        return "/vintner?location_fuzzy=%s" % location
-
     def get(self):
         if 'fuzzy' in self.request.GET:
             response = [{
@@ -71,55 +157,28 @@ class CountryHandler(MyHandler):
     """
     GET /country : list countries
     """
-    @staticmethod
-    def vintner_link(country):
-        return "/vintner?country=%s" % country
-
-    @staticmethod
-    def region_link(country):
-        return "/country/%s" % country
-
     def get(self):
-        response = [{
-            'country':country,
-            'regions':CountryHandler.region_link(country),
-            'vintners':CountryHandler.vintner_link(country)}
-            for country in regions.countries]
+        response = [{'country':country} for country in regions.countries]
         self.json_response(response)
 
 class RegionHandler(MyHandler):
     """
     GET /country/Canada : list regions
     """
-    @staticmethod
-    def vintner_link(region):
-        return "/vintner?region=%s" % region
-
-    @staticmethod
-    def subregion_link(country, region):
-        return "/country/%s/%s" % (country, region)
 
     def get(self, country):
-        response = [{
-            'region':region,
-            'subregions':RegionHandler.subregion_link(country, region),
-            'vintners':RegionHandler.vintner_link(region)}
-            for region in regions.regions_for_country(country)]
+        response = [{'region':region,'country':country}
+                    for region in regions.regions_for_country(country)]
         self.json_response(response)
 
 class SubRegionHandler(MyHandler):
     """
     GET /country/Canada/British Columbia : list subregions
     """
-    @staticmethod
-    def vintner_link(subregion):
-        return "/vintner?subregion=%s" % subregion
 
     def get(self, country):
-        response = [{
-            'subregion':subregion,
-            'vintners':SubRegionHandler.vintner_link(subregion)}
-            for subregion in regions.subregions_for_country(country, region)]
+        response = [{'subregion': subregion}
+                     for subregion in regions.subregions_for_country(country, region)]
         self.json_response(response)
 
 class VintnerBaseHandler(MyHandler):
@@ -137,6 +196,7 @@ class VintnerBaseHandler(MyHandler):
         /vintner?location="Canada - British Columbia: Okanagan Valley"
         /vintner?location_fuzzy="Somewhere"
         """
+        #TODO: Compound Queries
         get = self.request.GET
         if 'subregion' in get:
             self.json_response(Vintner.subregion_query(get['subregion']))
@@ -192,7 +252,7 @@ class VintnerBaseHandler(MyHandler):
             return
 
         self.response.content_type="text/plain"
-        self.response.write(key)
+        self.response.write(key.id())
 
 
 class VintnerHandler(MyHandler):

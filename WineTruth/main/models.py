@@ -6,6 +6,8 @@ import copy
 
 from stubs import ndb, uuid, debug
 
+#TODO : break models into multiple files?
+
 if debug:
     MAX_RESULTS = 100
 else:
@@ -17,6 +19,7 @@ class VerifiedToken(ndb.Model):
 
     @staticmethod
     def authenticate(token):
+        # TODO implement authentication
         if debug and token == 'stub-token':
             return "stub-user"
 
@@ -161,7 +164,7 @@ class Vintner(MyModel):
         u'British Columbia'
         >>> v_for_vintner.subregion
         u'Okanagan Valley'
-        >>> database_key
+        >>> database_key.id()
         'stub-key'
 
         If the location isn't in our list, it goes into location_fuzzy
@@ -353,7 +356,7 @@ class Vintner(MyModel):
 
         >>> v = Vintner()
         >>> v.create({'name':'Winery'})
-        'stub-key'
+        <stubs.Key object...>
         >>> v.private_token
         'stub-uuid'
         >>> v.verify('butts')

@@ -37,13 +37,13 @@ else:
                 self.key = ndb.Key("stub-key")
                 if self.parent:
                     ndb.Key.load_parent(self.parent)
-                return "stub-key"
+                return ndb.Key("stub-key")
             def to_dict(self, *args, **kwargs):
                 return vars(self)
             pass
         class Key(object):
             thing_to_get = None
-            parent = None
+            parent_ = None
             def __init__(self, *args):
                 self._id = "-".join([str(x) for x in args])
                 pass
@@ -52,13 +52,13 @@ else:
             def get(self, *args, **kwargs):
                 return ndb.Key.thing_to_get
             def parent(self, *args, **kwargs):
-                return ndb.Key.parent
+                return self.parent_
             @classmethod
             def load_get(cls, thing):
                 cls.thing_to_get = thing
             @classmethod
             def load_parent(cls, parent):
-                cls.parent = parent
+                cls.parent_ = parent
 
         class StringProperty:
             def __init__(self, *args, **kwargs):
