@@ -267,6 +267,24 @@ class VintnerWineBaseHandler(webapp2.RequestHandler):
         vintner_key = ndb.Key(Vintner, int(vintner_id))
         vintner = vintner_key.get()
 
+        if not vintner:
+            self.response.status = "400 Bad Request"
+            self.response.write("Vintner not found." )
+            return
+
+        post = self.request.POST
+
+        wine = Wine(parent=vintner_key)
+        try:
+            key = wine.create( post, vintner )
+        except ValueError as e:
+            self.response.status = "400 Bad Request"
+            self.response.write(str(e))
+            return
+
+        self.response.content_type="text/plain"
+        self.response.write(key)
+
 
 class VintnerWineHandler(webapp2.RequestHandler):
     def get(self, vintner_id, wine_id):

@@ -1,4 +1,3 @@
-from slugify import slugify
 import regions
 import wine_types
 
@@ -62,10 +61,28 @@ def remove_reserved_fields_from_the_post_object(post):
         del post['key']
     if 'link' in post:
         del post['link']
+    if 'year' in post:
+        del post['year']
+    if 'winetype' in post:
+        del post['winetype']
+    if 'varietal' in post:
+        del post['varietal']
+    if 'upc' in post:
+        del post['upc']
+    if 'json' in post:
+        del post['json']
     return post
 
 
-class Vintner(ndb.Model):
+class MyModel(ndb.Model):
+    """
+    Utility functions
+    """
+    def has_key(self, key):
+        dict_ = self.to_dict()
+        return key in dict_ and dict_[key] != "" and dict_[key] != {}
+
+class Vintner(MyModel):
     """
     Represents a single wine producer.
     """
@@ -73,10 +90,6 @@ class Vintner(ndb.Model):
 
     location = ndb.StringProperty(choices=regions.location_list)
     location_fuzzy = ndb.StringProperty()
-
-    def has_key(self, key):
-        dict_ = self.to_dict()
-        return key in dict_ and dict_[key] != "" and dict_[key] != {}
 
     @property
     def has_location(self):
@@ -156,7 +169,7 @@ class Vintner(ndb.Model):
         >>> v_for_vintner = Vintner()
         >>> database_key = v_for_vintner.create(post)
         >>> v_for_vintner.to_dict()
-        {'location_fuzzy': 'Other', ...}
+        {...'location_fuzzy': 'Other', ...}
         >>> v_for_vintner.to_dict()['location_fuzzy']
         'Other'
 
@@ -487,35 +500,137 @@ class Vintner(ndb.Model):
         return [x.location_fuzzy for x in results]
 
 
-
-class Place(ndb.Model):
-    address = ndb.TextProperty(indexed=False)
-    geopt = ndb.TextProperty(indexed=False)
-
-
-class Wine(ndb.Model):
+class Wine(MyModel):
     # Parent: Vintner
-    year = ndb.StringProperty()
-    slug = ndb.ComputedProperty(lambda self: self.autoslug())
+    year = ndb.IntegerProperty()
     name = ndb.StringProperty()
     winetype = ndb.StringProperty(required=True, choices=wine_types.types)
     varietal = ndb.StringProperty()
     upc = ndb.StringProperty()
-    verified = ndb.KeyProperty(kind=VerifiedToken)
+
+    @property
+    def has_year(self):
+        return self.has_key('year')
+
+    @property
+    def has_name(self):
+        return self.has_key('name')
+
+    @property
+    def has_winetype(self):
+        return self.has_key('winetype')
+
+    @property
+    def has_varietal(self):
+        return self.has_key('varietal')
+
+    @property
+    def has_upc(self):
+        return self.has_key('upc')
+
+    verified = ndb.BooleanProperty(default=False)
+    verified_by = ndb.StringProperty()
+
     json = ndb.JsonProperty(indexed=False)
     # JSON properties encompass the bits that might want to be tracked
     # but are too fiddly to keep track of regularly, like
     # bud_break, veraison, oak_regime, barrel_age, harvest_date,
     # bottling_date, alcohol_content, winemaker_notes, vineyard_notes...
 
-    def autoslug(self):
-        if self.year and self.name:
-            return slugify(self.year + "-" + self.name)
-        elif self.year and self.varietal:
-            return slugify(self.year + "-" + self.varietal)
-        elif self.name:
-            return slugify(self.name)
-        elif self.varietal:
-            return slugify(self.varietal)
+    def create(self, post, vintner):
+        """
+
+        >>> v = Vintner()
+        >>> v_key = v.create({'name':'Winery'})
+        >>> w = Wine(parent=v_key)
+        >>> post = {}
+        >>> post['name'] = 'Red Character'
+        >>> post['varietal'] = 'Blend'
+        >>> post['winetype'] = 'Red'
+        >>> post['upc'] = '1234567890'
+        >>> post['blend'] = ['Merlot', 'Cabernet Franc']
+        >>> post['token'] = "stub-uuid"
+        >>> w_key = w.create(post, v)
+
+        >>> w.name
+        'Red Character'
+        >>> w.varietal
+        'Blend'
+        >>> w.winetype
+        'Red'
+        >>> w.to_dict()['json']['blend']
+        ['Merlot', 'Cabernet Franc']
+        >>> w.verified
+        True
+        >>> w.verified_by
+        'Vintner'
+
+        """
+        name = None
+        if 'name' in post:
+            name = post['name']
+            self.name = name
+            del post['name']
+
+        year = None
+        if 'year' in post:
+            year = post['year']
+            self.year = year
+            del post['year']
+
+        winetype = None
+        if 'winetype' in post:
+            winetype = post['winetype']
+            if not winetype in wine_types.types:
+                raise ValueError("Invalid Wine Type: " + str(winetype))
+            else:
+                self.winetype = winetype
+                del post['winetype']
+
+        varietal = None
+        if 'varietal' in post:
+            varietal = post['varietal']
+            self.varietal = varietal
+            del post['varietal']
+
+        upc = None
+        if 'upc' in post:
+            upc = post['upc']
+            del post['upc']
+
+        if not name and not winetype and not year and not varietal and not upc:
+            raise ValueError("You must provide a name, year, winetype,"+
+                             " varietal, or upc.")
+
+        token = None
+        if 'token' in post:
+            token = post['token']
+            self.verify(token, vintner)
+            del post['token']
+
+        json = tidy_up_the_post_object(post)
+        self.json = json
+
+        key = self.put()
+        return key
+
+    def verify(self, token=None, vintner=None):
+        if not token:
+            return False
+        if vintner and token == vintner.private_token:
+            self.verified = True
+            self.verified_by = "Vintner"
+            return True
         else:
-            return slugify(self.winetype)
+            user = VerifiedToken.authenticate(token)
+            if user:
+                self.verified = True
+                self.verified_by = user
+                return True
+        return False
+
+
+class Place(ndb.Model):
+    # Parent: Vintner
+    address = ndb.TextProperty(indexed=False)
+    geopt = ndb.TextProperty(indexed=False)
