@@ -31,6 +31,7 @@ else:
             def __init__(self, *args, **kwargs):
                 pass
             def put(self, *args, **kwargs):
+                self.key = ndb.Key("stub-key")
                 return "stub-key"
             def to_dict(self, *args, **kwargs):
                 return vars(self)

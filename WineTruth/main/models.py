@@ -7,6 +7,10 @@ import copy
 
 from stubs import ndb, uuid, debug
 
+if debug:
+    MAX_RESULTS = 100
+else:
+    MAX_RESULTS = 5000
 
 class VerifiedToken(ndb.Model):
     name = ndb.StringProperty(required=True)
@@ -56,6 +60,8 @@ def remove_reserved_fields_from_the_post_object(post):
         del post['token']
     if 'key' in post:
         del post['key']
+    if 'link' in post:
+        del post['link']
     return post
 
 
@@ -66,7 +72,7 @@ class Vintner(ndb.Model):
     name = ndb.StringProperty(required=True)
 
     location = ndb.StringProperty(choices=regions.location_list)
-    location_fuzzy = ndb.StringProperty(indexed=False)
+    location_fuzzy = ndb.StringProperty()
 
     def has_key(self, key):
         dict_ = self.to_dict()
@@ -118,7 +124,6 @@ class Vintner(ndb.Model):
         return self.has_key('json')
     # website, phone_number
 
-
     def create(self, post):
         """
         Given a dict 'post' object containing vintner-y fields,
@@ -150,7 +155,7 @@ class Vintner(ndb.Model):
         >>> post = {'name':'Super Winery 2', 'location':location}
         >>> v_for_vintner = Vintner()
         >>> database_key = v_for_vintner.create(post)
-        >>> vars(v_for_vintner)
+        >>> v_for_vintner.to_dict()
         {'location_fuzzy': 'Other', ...}
         >>> v_for_vintner.to_dict()['location_fuzzy']
         'Other'
@@ -371,10 +376,16 @@ class Vintner(ndb.Model):
         """
         Get the contents of this model as a dictionary.
         Never includes 'private_token'
+        Tries to include 'key'
         """
         dict_ = copy.deepcopy(super(Vintner, self).to_dict())
         if 'private_token' in dict_:
             del dict_['private_token']
+        try:
+            if self.key:
+                dict_['key'] = self.key.id()
+        except AttributeError:
+            pass
         return dict_
 
     def set_location(self, location):
@@ -412,6 +423,69 @@ class Vintner(ndb.Model):
                 self.region = region
             if subregion:
                 self.subregion = subregion
+
+    @staticmethod
+    def country_query(country):
+        qry = Vintner.query(Vintner.country == country)
+        results = qry.fetch(MAX_RESULTS, projection=[Vintner.name,
+                                            Vintner.verified, Vintner.location])
+        return [x for x in results]
+
+    @staticmethod
+    def region_query(region):
+        qry = Vintner.query(Vintner.region == region)
+        results = qry.fetch(MAX_RESULTS, projection=[Vintner.name,
+                                            Vintner.verified, Vintner.location])
+        return [x for x in results]
+
+    @staticmethod
+    def subregion_query(subregion):
+        qry = Vintner.query(Vintner.subregion == subregion)
+        results = qry.fetch(MAX_RESULTS, projection=[Vintner.name,
+                                            Vintner.verified, Vintner.location])
+        return [x for x in results]
+
+    @staticmethod
+    def name_query(name):
+        qry = Vintner.query(Vintner.name == name)
+        results = qry.fetch(MAX_RESULTS, projection=[Vintner.verified,
+                                                     Vintner.location])
+        return [x for x in results]
+
+    @staticmethod
+    def verified_query(verified):
+        qry = Vintner.query(Vintner.verified == verified)
+        results = qry.fetch(MAX_RESULTS, projection=[Vintner.name,
+                                                     Vintner.location])
+        return [x for x in results]
+
+    @staticmethod
+    def verified_by_query(verified_by):
+        qry = Vintner.query(Vintner.verified_by == verified_by)
+        results = qry.fetch(MAX_RESULTS, projection=[Vintner.name,
+                                                     Vintner.location])
+        return [x for x in results]
+
+    @staticmethod
+    def location_query(location):
+        qry = Vintner.query(Vintner.location == location)
+        results = qry.fetch(MAX_RESULTS, projection=[Vintner.name,
+                                                     Vintner.verified])
+        return [x for x in results]
+
+    @staticmethod
+    def location_fuzzy_query(location):
+        qry = Vintner.query(Vintner.location_fuzzy == location)
+        results = qry.fetch(MAX_RESULTS, projection=[Vintner.name,
+                                                     Vintner.verified])
+        return [x for x in results]
+
+    @staticmethod
+    def all_fuzzy_locations():
+        qry = Vintner.query(Vintner.location_fuzzy != None)
+        results = qry.fetch(MAX_RESULTS)
+        return [x.location_fuzzy for x in results]
+
 
 
 class Place(ndb.Model):
