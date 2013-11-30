@@ -1,4 +1,4 @@
-from models import Vintner, YouNeedATokenForThat
+from models import Vintner, Wine, YouNeedATokenForThat
 import regions
 
 import os

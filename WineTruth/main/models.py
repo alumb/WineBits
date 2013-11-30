@@ -28,6 +28,7 @@ class YouNeedATokenForThat(Exception):
 def tidy_up_the_post_object(post):
     post = add_json_fields_to_the_post_object(post)
     post = remove_reserved_fields_from_the_post_object(post)
+    post = {key: value for key, value in post.iteritems()}
     return post
 
 
@@ -574,7 +575,7 @@ class Wine(MyModel):
 
         year = None
         if 'year' in post:
-            year = post['year']
+            year = int(post['year'])
             self.year = year
             del post['year']
 
@@ -598,8 +599,11 @@ class Wine(MyModel):
             upc = post['upc']
             del post['upc']
 
-        if not name and not winetype and not year and not varietal and not upc:
-            raise ValueError("You must provide a name, year, winetype,"+
+        if not winetype:
+            raise ValueError("You must provide a winetype")
+
+        if not name and not year and not varietal and not upc:
+            raise ValueError("You must provide a name, year, "+
                              " varietal, or upc.")
 
         token = None
