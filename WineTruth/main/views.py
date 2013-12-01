@@ -154,6 +154,7 @@ class VarietalHandler(MyHandler):
     /varietal : all varietals
     """
     #TODO: test VarietalHandler
+    #TODO: test fuzzy Varietal
     def get(self):
         response = [{'varietal':varietal}
                     for varietal in wine_types.wine_options]

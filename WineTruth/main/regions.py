@@ -1,5 +1,7 @@
 # coding=latin-1
 
+#TODO: Fill in
+
 region_map = {
     u"Argentina":[
         u"Mendoza",
