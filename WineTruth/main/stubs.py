@@ -184,7 +184,7 @@ else:
             def __init__(self, *args, **kwargs):
                 pass
 
-if not debug:
+if google_is_here:
     import uuid
 else:
     class uuid(object):

@@ -1,4 +1,4 @@
-from models import Vintner, Wine, YouNeedATokenForThat
+from models import Vintner, Wine, YouNeedATokenForThat, VerifiedToken
 import regions
 import wine_types
 
@@ -132,13 +132,50 @@ class MyHandler(webapp2.RequestHandler):
         else:
             self.response.write( json.dumps(object_) )
 
+
+class TokenHandler(MyHandler):
+    """
+    Create a token for person.
+
+    Bootstrap rule:
+    If no 'classam' token exists in the system, one can be created
+    without a token.
+
+    Any further tokens must be created by a user with a valid token.
+
+    GET /token/person
+    """
+    def post(self, name):
+
+        post = self.request.POST
+
+        if not VerifiedToken.classam():
+            token = VerifiedToken.new_token('classam', 'bootstrap')
+            self.response.write(token)
+            return
+
+        if not 'token' in post:
+            self.response.status = "401 Unauthorized"
+            self.response.write("401 Unauthorized")
+            return
+
+        user = VerifiedToken.authenticate(post['token'])
+        if not user:
+            self.response.status = "401 Unauthorized"
+            self.response.write("401 Unauthorized")
+            return
+
+        token = VerifiedToken.new_token(name, user)
+        self.response.write(token)
+
+
+
 class LocationHandler(MyHandler):
     """
     GET /location : an exhaustive list of every location
     GET /location?fuzzy=true : every location_fuzzy
     """
     #TODO: test LocationHandler
-    #TODO: fold LocationHandler, WineTypeHandler, et-al into a megahandler
     def get(self):
         if 'fuzzy' in self.request.GET:
             response = [{'location_fuzzy':location}
@@ -154,7 +191,7 @@ class VarietalHandler(MyHandler):
     /varietal : all varietals
     """
     #TODO: test VarietalHandler
-    #TODO: test fuzzy Varietal
+    #TODO: create fuzzy Varietal
     def get(self):
         response = [{'varietal':varietal}
                     for varietal in wine_types.wine_options]
@@ -424,6 +461,7 @@ class SearchHandler(MyHandler):
 
 
 routes = [
+            (r'/token/([\w\s\d])+', TokenHandler),
             (r'/location', LocationHandler),
             (r'/winetype', WineTypeHandler),
             (r'/varietal', VarietalHandler),

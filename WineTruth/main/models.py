@@ -10,6 +10,8 @@ from stubs import ndb, uuid, debug
 #TODO : break models into multiple files?
 #TODO: Wine index searches
 #TODO: "Cache Invalidation" events
+#TODO: prime the database with sample data
+
 
 if debug:
     MAX_RESULTS = 100
@@ -19,12 +21,35 @@ else:
 class VerifiedToken(ndb.Model):
     name = ndb.StringProperty(required=True)
     token = ndb.StringProperty(required=True)
+    created_by = ndb.StringProperty(required=True, indexed=False)
+
+    @staticmethod
+    def classam():
+        qry = VerifiedToken.query(VerifiedToken.name == 'classam')
+        results = qry.fetch(1)
+        if len(results) > 0:
+            return results[0].token
+        return False
+
+    @staticmethod
+    def new_token(name, created_by):
+        v = VerifiedToken(name=name, token=uuid.uuid4().hex,
+                            created_by=created_by)
+        v.put()
+        return v.token
 
     @staticmethod
     def authenticate(token):
-        # TODO implement authentication
         if debug and token == 'stub-token':
             return "stub-user"
+        else:
+            qry = VerifiedToken.query(VerifiedToken.token == token)
+            results = qry.fetch(1, projection=[VerifiedToken.name])
+            results = [x for x in results]
+            if len(results) > 0:
+                return results[0].name
+            return False
+
 
 
 class YouNeedATokenForThat(Exception):
