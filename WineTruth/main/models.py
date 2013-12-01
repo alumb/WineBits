@@ -18,6 +18,8 @@ if debug:
 else:
     MAX_RESULTS = 5000
 
+UPDATE_BATCH_SIZE = 5
+
 class VerifiedToken(ndb.Model):
     name = ndb.StringProperty(required=True)
     token = ndb.StringProperty(required=True)
@@ -379,7 +381,6 @@ class Vintner(MyModel):
         else:
             self.json = json
 
-        self.rank = self.calculate_rank(self.wine_query())
         self.put()
 
     def verify(self, token=None):
@@ -425,10 +426,6 @@ class Vintner(MyModel):
                 self.verified_by = user
                 return True
         return False
-
-    def update_rank(self):
-        self.rank = self.calculate_rank(self.wine_query())
-        self.put()
 
     def calculate_rank(self, wines=[]):
         """
@@ -508,6 +505,23 @@ class Vintner(MyModel):
                 self.region = region
             if subregion:
                 self.subregion = subregion
+
+    def queued_update(self):
+        """
+        If a vintner is updated, it triggers potentially expensive operations
+        that are queued for later. They go in here.
+        Any entities that must be 'put' are returned in a list.
+        """
+        puts = []
+
+        wines = self.wine_query()
+        self.rank = self.calculate_rank(wines)
+        puts.append(self)
+
+        #TODO: update search index for vintner and all wines here.
+
+        return puts
+
 
     @staticmethod
     def country_query(country):
@@ -860,6 +874,38 @@ class Wine(MyModel):
                 return True
         return False
 
+
+class Invalidations(ndb.Model):
+    vintner_key = ndb.KeyProperty(kind=Vintner)
+    time = ndb.DateTime(auto_now_add=True)
+    executed = ndb.Boolean(default=False)
+
+    @staticmethod
+    def queue_update(vintner_key):
+        i = Invalidations(vintner_key=vintner_key)
+        i.put()
+
+    @staticmethod
+    def get_invalidations_before(date):
+        #TODO: get_invalidations_before(date)
+        pass
+
+    @staticmethod
+    def run_update():
+        qry = Invalidations.query(Invalidations.executed == False)
+        results = qry.fetch(UPDATE_BATCH_SIZE)
+        invalidations = [x for x in results]
+        vintner_keys = [x.vintner_key for x in invalidations]
+        #remove duplicate keys
+        vintner_keys = list(set(vintner_keys))
+        vintners = ndb.get_multi(vintner_keys)
+        puts = []
+        for vintner in vintners:
+            puts = puts + vintner.queued_update()
+        for invalidation in invalidations:
+            invalidation.executed = True
+            puts.append(invalidation)
+        ndb.put_multi(puts)
 
 class Place(ndb.Model):
     # Parent: Vintner
