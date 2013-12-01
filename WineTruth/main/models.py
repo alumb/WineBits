@@ -877,8 +877,8 @@ class Wine(MyModel):
 
 class Invalidations(ndb.Model):
     vintner_key = ndb.KeyProperty(kind=Vintner)
-    time = ndb.DateTime(auto_now_add=True)
-    executed = ndb.Boolean(default=False)
+    time = ndb.DateTimeProperty(auto_now_add=True)
+    executed = ndb.BooleanProperty(default=False)
 
     @staticmethod
     def queue_update(vintner_key):

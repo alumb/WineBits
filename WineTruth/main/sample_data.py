@@ -11,7 +11,7 @@ def sample_data():
     w.create({'name': 'Mosaic',
               'varietal': 'Blend',
               'winetype': 'Red',
-              'year': '2008'
+              'year': '2008',
               'alcohol': '13.8%',
               'upc': '626990028932'}, v)
 
@@ -39,7 +39,7 @@ def sample_data():
     w = Wine(parent=v_key)
     w.create({'name': 'Character',
               'varietal': 'Blend',
-              'year', '2011',
+              'year': '2011',
               'winetype': 'Red',
               'alcohol': '13.5%',
               'upc': '626990112228',
