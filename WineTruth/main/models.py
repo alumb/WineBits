@@ -47,6 +47,8 @@ def add_json_fields_to_the_post_object(post):
 def remove_reserved_fields_from_the_post_object(post):
     if 'name' in post:
         del post['name']
+    if 'rank' in post:
+        del post['rank']
     if 'country' in post:
         del post['country']
     if 'region' in post:
@@ -125,6 +127,8 @@ class Vintner(MyModel):
     verified = ndb.BooleanProperty(default=False)
     verified_by = ndb.StringProperty()
     private_token = ndb.StringProperty(indexed=False)
+
+    rank = ndb.IntegerProperty(required=True, default=0)
 
     @property
     def has_verified(self):
@@ -215,6 +219,8 @@ class Vintner(MyModel):
         # we wedge everything else into the JSON
         json = tidy_up_the_post_object(post)
         self.json = json
+
+        self.rank = self.calculate_rank()
 
         key = self.put()
         return key
@@ -343,6 +349,7 @@ class Vintner(MyModel):
         else:
             self.json = json
 
+        self.rank = self.calculate_rank(self.wine_query())
         self.put()
 
     def verify(self, token=None):
@@ -388,6 +395,37 @@ class Vintner(MyModel):
                 self.verified_by = user
                 return True
         return False
+
+    def update_rank(self):
+        self.rank = self.calculate_rank(self.wine_query())
+        self.put()
+
+    def calculate_rank(self, wines=[]):
+        """
+        A potentially expensive operation, to try to quantify
+        how much data this Vintner object contains.
+        More is better.
+        """
+        rank = 0
+        if self.has_verified and self.has_verified_by:
+            rank += 10000
+        if self.has_country:
+            rank += 50
+        if self.has_region:
+            rank += 100
+        if self.has_subregion:
+            rank += 200
+        if not self.has_location and self.has_location_fuzzy:
+            rank += 50
+
+        if self.has_json:
+            for key in self.to_dict['json']:
+                rank += 4
+
+        for wine in wines:
+            rank += wine.calculate_rank()
+
+        return rank
 
     def to_dict(self):
         """
@@ -502,6 +540,11 @@ class Vintner(MyModel):
         qry = Vintner.query(Vintner.location_fuzzy != None)
         results = qry.fetch(MAX_RESULTS)
         return [x.location_fuzzy for x in results]
+
+    def wine_query(self):
+        qry = Wine.query(ancestor=self.key)
+        results = qry.fetch(MAX_RESULTS)
+        return [x for x in results]
 
 
 class Wine(MyModel):
@@ -620,6 +663,23 @@ class Wine(MyModel):
 
         key = self.put()
         return key
+
+    def calculate_rank(self):
+        rank = 0
+        if self.has_year:
+            rank += 1
+        if self.has_name:
+            rank += 1
+        if self.has_winetype:
+            rank += 1
+        if self.has_varietal:
+            rank += 2
+        if self.has_upc:
+            rank += 5
+        if self.has_json:
+            for key in self.to_dict()['json']:
+                rank += 1
+        return rank
 
     def verify(self, token=None, vintner=None):
         if not token:

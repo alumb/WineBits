@@ -114,7 +114,7 @@ class MyHandler(webapp2.RequestHandler):
             return object_
         except AttributeError as e:
             return model
-
+/vintner/5838406743490560
     def json_response(self, model):
         """
         Return object_ as JSON, with 'application/json' type.
@@ -251,8 +251,7 @@ class VintnerBaseHandler(MyHandler):
             self.response.write(str(e))
             return
 
-        self.response.content_type="text/plain"
-        self.response.write(key.id())
+        self.json_response(vintner)
 
 
 class VintnerHandler(MyHandler):
@@ -317,13 +316,19 @@ class VintnerHandler(MyHandler):
         self.json_response(vintner)
 
 
-class VintnerWineBaseHandler(webapp2.RequestHandler):
+class VintnerWineBaseHandler(MyHandler):
     def get(self, vintner_id):
+        """
+        /vintner/12345/wine => all wines for vintner
+        """
         vintner_key = ndb.Key(Vintner, int(vintner_id))
         vintner = vintner_key.get()
-        self.response.write("Wines for vintner")
+        self.json_response(vintner.wine_query())
 
     def post(self, vintner_id):
+        """
+        POST /vintner/12345/wine => create a wine for vintner
+        """
         vintner_key = ndb.Key(Vintner, int(vintner_id))
         vintner = vintner_key.get()
 
@@ -337,14 +342,13 @@ class VintnerWineBaseHandler(webapp2.RequestHandler):
         wine = Wine(parent=vintner_key)
         try:
             key = wine.create( post, vintner )
+            vintner.update_rank()
         except ValueError as e:
             self.response.status = "400 Bad Request"
             self.response.write(str(e))
             return
 
-        self.response.content_type="text/plain"
-        self.response.write(key)
-
+        self.json_response(wine)
 
 class VintnerWineHandler(webapp2.RequestHandler):
     def get(self, vintner_id, wine_id):
