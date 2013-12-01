@@ -1,13 +1,11 @@
 from models import Vintner, Wine, YouNeedATokenForThat
 import regions
+import wine_types
 
 import os
 import json
 
 from stubs import webapp2, ndb, debug
-
-# TODO: Varietal list
-
 
 def get_url(model):
     """
@@ -139,26 +137,44 @@ class LocationHandler(MyHandler):
     GET /location : an exhaustive list of every location
     GET /location?fuzzy=true : every location_fuzzy
     """
+    #TODO: test LocationHandler
+    #TODO: fold LocationHandler, WineTypeHandler, et-al into a megahandler
     def get(self):
         if 'fuzzy' in self.request.GET:
-            response = [{
-                'location':location,
-                'vintners':LocationHandler.fuzzy_vintner_link(location)}
-                for location in Vintner.all_fuzzy_locations()]
-
+            response = [{'location_fuzzy':location}
+                        for location in Vintner.all_fuzzy_locations()]
             self.json_response(response)
         else:
-            response = [{
-                'location':location,
-                'vintners':LocationHandler.vintner_link(location)}
-                for location in regions.location_list]
-
+            response = [{'location':location}
+                        for location in regions.location_list]
             self.json_response(response)
+
+class VarietalHandler(MyHandler):
+    """
+    /varietal : all varietals
+    """
+    #TODO: test VarietalHandler
+    def get(self):
+        response = [{'varietal':varietal}
+                    for varietal in wine_types.wine_options]
+        self.json_response(response)
+
+class WineTypeHandler(MyHandler):
+    """
+    /winetype : all wine-types
+    """
+    #TODO: test WineTypeHandler
+    def get(self):
+        response = [{'winetype':winetype}
+                    for winetype in wine_types.types]
+        self.json_response(response)
 
 class CountryHandler(MyHandler):
     """
     GET /country : list countries
     """
+    #TODO: test CountryHandler
+
     def get(self):
         response = [{'country':country} for country in regions.countries]
         self.json_response(response)
@@ -167,6 +183,7 @@ class RegionHandler(MyHandler):
     """
     GET /country/Canada : list regions
     """
+    #TODO: test RegionHandler
 
     def get(self, country):
         response = [{'region':region,'country':country}
@@ -177,6 +194,7 @@ class SubRegionHandler(MyHandler):
     """
     GET /country/Canada/British Columbia : list subregions
     """
+    #TODO: test SubRegionHandler
 
     def get(self, country):
         response = [{'subregion': subregion}
@@ -199,6 +217,7 @@ class VintnerBaseHandler(MyHandler):
         /vintner?location_fuzzy="Somewhere"
         """
         #TODO: Compound Queries
+        #TODO: convert location query into country/region/subregion query
         get = self.request.GET
         if 'subregion' in get:
             self.json_response(Vintner.subregion_query(get['subregion']))
@@ -405,6 +424,8 @@ class SearchHandler(MyHandler):
 
 routes = [
             (r'/location', LocationHandler),
+            (r'/winetype', WineTypeHandler),
+            (r'/varietal', VarietalHandler),
             (r'/country', CountryHandler),
             (r'/country/([\w\s\d%]+)', RegionHandler),
             (r'/country/([\w\s\d%]+)/([\w\s\d%]+)', SubRegionHandler),
