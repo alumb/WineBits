@@ -40,6 +40,9 @@ else:
                 return ndb.Key("stub-key")
             def to_dict(self, *args, **kwargs):
                 return vars(self)
+            @classmethod
+            def query(cls, *args, **kwargs):
+                return ndb.QueryResult(args, kwargs)
             pass
         class Key(object):
             thing_to_get = None
@@ -59,6 +62,12 @@ else:
             @classmethod
             def load_parent(cls, parent):
                 cls.parent_ = parent
+
+        class QueryResult:
+            def __init__(self, *args, **kwargs):
+                pass
+            def fetch(self, *args, **kwargs):
+                return []
 
         class StringProperty:
             def __init__(self, *args, **kwargs):

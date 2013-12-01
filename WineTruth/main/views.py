@@ -6,6 +6,8 @@ import json
 
 from stubs import webapp2, ndb, debug
 
+# TODO: Varietal list
+
 
 def get_url(model):
     """
@@ -53,22 +55,22 @@ def add_links(dict_):
         {...'vintner_subregion': '/vintner?subregion=Okanagan'...}
 
     """
-    if 'location' in dict_:
+    if 'location' in dict_ and dict_['location']:
         location = dict_['location']
         dict_['vintner_location'] = "/vintner?location=%s" % location
-    if 'location_fuzzy' in dict_:
+    if 'location_fuzzy' in dict_ and dict_['location_fuzzy']:
         location = dict_['location_fuzzy']
         dict_['vintner_location_fuzzy'] = "/vintner?location_fuzzy=%s" % location
-    if 'country' in dict_:
+    if 'country' in dict_ and dict_['country']:
         country = dict_['country']
         dict_['vintner_country'] = "/vintner?country=%s" % country
         dict_['country_regions'] = "/country/%s" % country
-    if 'region' in dict_ and 'country' in dict_:
+    if 'region' in dict_ and 'country' in dict_ and dict_['region']:
         region = dict_['region']
         country = dict_['country']
         dict_['vintner_region'] = "/vintner?region=%s" % region
         dict_['region_subregions'] = "/country/%s/%s" % (country, region)
-    if 'subregion' in dict_:
+    if 'subregion' in dict_ and dict_['subregion']:
         subregion = dict_['subregion']
         dict_['vintner_subregion'] = "/vintner?subregion=%s" % subregion
     return dict_
@@ -114,7 +116,7 @@ class MyHandler(webapp2.RequestHandler):
             return object_
         except AttributeError as e:
             return model
-/vintner/5838406743490560
+
     def json_response(self, model):
         """
         Return object_ as JSON, with 'application/json' type.
@@ -236,9 +238,9 @@ class VintnerBaseHandler(MyHandler):
         >>> v.request.POST = {'name':'Winery'}
         >>> v.post()
         >>> v.response.content_type
-        'text/plain'
+        'application/json'
         >>> v.response.last_write
-        'stub-key'
+        '{..."key": "stub-key"...}'
 
         """
         post = self.request.POST
@@ -323,6 +325,12 @@ class VintnerWineBaseHandler(MyHandler):
         """
         vintner_key = ndb.Key(Vintner, int(vintner_id))
         vintner = vintner_key.get()
+
+        if not vintner:
+            self.response.write("404 Not Found")
+            self.response.status = "404 Not Found"
+            return
+
         self.json_response(vintner.wine_query())
 
     def post(self, vintner_id):
@@ -333,8 +341,8 @@ class VintnerWineBaseHandler(MyHandler):
         vintner = vintner_key.get()
 
         if not vintner:
-            self.response.status = "400 Bad Request"
-            self.response.write("Vintner not found." )
+            self.response.status = "404 Not Found"
+            self.response.write("404 Not found." )
             return
 
         post = self.request.POST
@@ -350,12 +358,43 @@ class VintnerWineBaseHandler(MyHandler):
 
         self.json_response(wine)
 
-class VintnerWineHandler(webapp2.RequestHandler):
+class VintnerWineHandler(MyHandler):
     def get(self, vintner_id, wine_id):
-        pass
+        wine_key = ndb.Key(Vintner, int(vintner_id), Wine, int(wine_id))
+        wine = wine_key.get()
+
+        if not wine:
+            self.response.status = "404 Not Found"
+            self.response.write("404 Not found." )
+            return
+
+        self.json_response(wine)
+
+    def post(self, vintner_id, wine_id):
+        vintner_key = ndb.Key(Vintner, int(vintner_id))
+        vintner = vintner_key.get()
+        wine_key = ndb.Key(Vintner, int(vintner_id), Wine, int(wine_id))
+        wine = wine_key.get()
+
+        if not vintner or not wine:
+            self.response.status = "404 Not Found"
+            self.response.write("404 Not found." )
+            return
+
+        post = self.request.POST
+
+        try:
+            wine.update(post, vintner)
+        except YouNeedATokenForThat as e:
+            self.response.write(str(e))
+            self.response.status = "401 Unauthorized"
+            return
+
+        self.json_response(wine)
 
 
-class SearchHandler(webapp2.RequestHandler):
+
+class SearchHandler(MyHandler):
     """
     /search
     """

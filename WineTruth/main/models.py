@@ -3,10 +3,13 @@ import wine_types
 
 import os
 import copy
+import json
 
 from stubs import ndb, uuid, debug
 
 #TODO : break models into multiple files?
+#TODO: Wine index searches
+#TODO: "Cache Invalidation" events
 
 if debug:
     MAX_RESULTS = 100
@@ -31,8 +34,15 @@ class YouNeedATokenForThat(Exception):
 def tidy_up_the_post_object(post):
     post = add_json_fields_to_the_post_object(post)
     post = remove_reserved_fields_from_the_post_object(post)
-    post = {key: value for key, value in post.iteritems()}
-    return post
+    new_post = {}
+    for key, value in post.iteritems():
+        try:
+            new_post[key] = json.loads(value)
+        except ValueError:
+            new_post[key] = value
+        except TypeError:
+            new_post[key] = value
+    return new_post
 
 
 def add_json_fields_to_the_post_object(post):
@@ -86,7 +96,9 @@ class MyModel(ndb.Model):
     """
     def has_key(self, key):
         dict_ = self.to_dict()
-        return key in dict_ and dict_[key] != "" and dict_[key] != {}
+        return (key in dict_ and dict_[key] and dict_[key] != ""
+                and dict_[key] != {})
+
 
 class Vintner(MyModel):
     """
@@ -283,11 +295,9 @@ class Vintner(MyModel):
         >>> v.subregion
         u'Similkameen Valley'
 
-        Once a token has touched something it can never be changed again.
+        Once a token has touched something it can still be changed.
         >>> v.update({'completely_new_field':'hurfdorf'})
-        Traceback (most recent call last):
-        ...
-        YouNeedATokenForThat...
+
         """
 
         def field_edit_error(fieldname):
@@ -297,11 +307,6 @@ class Vintner(MyModel):
         if 'token' in post:
             can_edit_fields = self.verify(post['token'])
             del post['token']
-
-        # Once verified, it can never be changed again
-        if (self.has_verified and self.to_dict()['verified']
-            and not can_edit_fields):
-            raise YouNeedATokenForThat("You can't edit verified records.")
 
         if 'name' in post and post['name'] != self.to_dict()['name']:
             if not can_edit_fields:
@@ -419,8 +424,8 @@ class Vintner(MyModel):
             rank += 50
 
         if self.has_json:
-            for key in self.to_dict['json']:
-                rank += 4
+            for key in self.to_dict()['json']:
+                rank += 10
 
         for wine in wines:
             rank += wine.calculate_rank()
@@ -584,6 +589,9 @@ class Wine(MyModel):
     # bud_break, veraison, oak_regime, barrel_age, harvest_date,
     # bottling_date, alcohol_content, winemaker_notes, vineyard_notes...
 
+    def has_json(self):
+        return self.has_key('json')
+
     def create(self, post, vintner):
         """
 
@@ -664,24 +672,155 @@ class Wine(MyModel):
         key = self.put()
         return key
 
+    def update(self, post, vintner):
+        """
+        >>> v = Vintner()
+        >>> v_key = v.create({"name":"Winery"})
+        >>> w = Wine(parent=v_key)
+        >>> w_key = w.create({"winetype":"Red", "year":"2010"}, v)
+
+        The base case.
+        >>> w.update({"name":"Red Character", "terroir":"Good"}, v)
+        >>> w.to_dict()["name"]
+        'Red Character'
+
+        >>> w.to_dict()["json"]["terroir"]
+        'Good'
+
+        >>> w2 = Wine(parent=v_key)
+        >>> w2.update({"winetype":"White", "year":"2011"}, v)
+        >>> w2.to_dict()["winetype"]
+        'White'
+
+        >>> w2.to_dict()["year"]
+        2011
+
+        >>> w.update({"varietal":"Blend"}, v)
+        >>> w.to_dict()["varietal"]
+        'Blend'
+
+        >>> w.update({"upc":"123456789"}, v)
+        >>> w.to_dict()["upc"]
+        '123456789'
+
+        You can't replace a field.
+        >>> w.update({"winetype":"White"}, v)
+        Traceback (most recent call last):
+        ...
+        YouNeedATokenForThat...
+
+        >>> w.update({"terroir": "at danger lake!"}, v)
+        Traceback (most recent call last):
+        ...
+        YouNeedATokenForThat...
+
+        Should be fine if you update a thing with itself.
+        >>> w.update({"winetype":"Red"}, v)
+        >>> w.update({"terroir":"Good"}, v)
+
+        You can update whatever you like if you have a token.
+        >>> w.update({"winetype":"White", "token":"stub-uuid"}, v)
+        >>> w.to_dict()["winetype"]
+        'White'
+
+        """
+        def field_edit_error(fieldname):
+            return YouNeedATokenForThat(("You can't edit fields that already" +
+                                          " exist: %s" % fieldname))
+
+        can_edit_fields = False
+        if 'token' in post:
+            token = post['token']
+            can_edit_fields = self.verify(token, vintner)
+            del post['token']
+
+        def can_edit_field(field_name):
+            if field_name in post:
+                if not self.has_key(field_name):
+                    return True
+                if post[field_name] == str(self.to_dict()[field_name]):
+                    return True
+                if can_edit_fields:
+                    return True
+                raise field_edit_error(field_name)
+            else:
+                return False
+
+        name = None
+        if can_edit_field('name'):
+            name = post['name']
+            self.name = name
+            del post['name']
+
+        year = None
+        if can_edit_field('year'):
+            year = int(post['year'])
+            self.year = year
+            del post['year']
+
+        winetype = None
+        if can_edit_field('winetype'):
+            winetype = post['winetype']
+            if not winetype in wine_types.types:
+                raise ValueError("Invalid Wine Type: " + str(winetype))
+            else:
+                self.winetype = winetype
+                del post['winetype']
+
+        varietal = None
+        if can_edit_field('varietal'):
+            varietal = post['varietal']
+            self.varietal = varietal
+            del post['varietal']
+
+        upc = None
+        if can_edit_field('upc'):
+            upc = post['upc']
+            self.upc = upc
+            del post['upc']
+
+        json = tidy_up_the_post_object(post)
+        if 'json' in self.to_dict():
+            new_json = self.to_dict()['json']
+            for key, value in json.iteritems():
+                if key in new_json and can_edit_fields:
+                    new_json[key] = value
+                if not (key in new_json):
+                    new_json[key] = value
+                if key in new_json and new_json[key] == value:
+                    pass
+                else:
+                    raise field_edit_error(key)
+            self.json = new_json
+        else:
+            self.json = json
+
+        key = self.put()
+        return None
+
     def calculate_rank(self):
         rank = 0
         if self.has_year:
-            rank += 1
-        if self.has_name:
-            rank += 1
-        if self.has_winetype:
-            rank += 1
-        if self.has_varietal:
             rank += 2
+        if self.has_name:
+            rank += 2
+        if self.has_winetype:
+            rank += 2
+        if self.has_varietal:
+            rank += 4
         if self.has_upc:
-            rank += 5
+            rank += 8
         if self.has_json:
             for key in self.to_dict()['json']:
                 rank += 1
         return rank
 
     def verify(self, token=None, vintner=None):
+        """
+        Sets self.verified and self.verified_by,
+        True if the token is valid
+        False if not
+        """
         if not token:
             return False
         if vintner and token == vintner.private_token:
