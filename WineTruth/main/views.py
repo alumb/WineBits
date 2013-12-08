@@ -1,4 +1,4 @@
-from models import Vintner, Wine, YouNeedATokenForThat, VerifiedToken
+from models import Winery, Wine, YouNeedATokenForThat, VerifiedToken
 import regions
 import wine_types
 
@@ -9,21 +9,21 @@ from stubs import webapp2, ndb, debug
 
 def get_url(model):
     """
-        >>> v = Vintner()
+        >>> v = Winery()
         >>> key = v.create({'name':'Winery'})
         >>> get_url(v)
-        '/vintner/stub-key'
+        '/winery/stub-key'
 
         >>> w = Wine(parent=key)
         >>> key = w.create({'winetype':'Red', 'year':'2010'}, v)
         >>> get_url(w)
-        '/vintner/stub-key/wine/stub-key'
+        '/winery/stub-key/wine/stub-key'
     """
-    if isinstance(model, Vintner):
-        return "/vintner/%s" % str(model.key.id())
+    if isinstance(model, Winery):
+        return "/winery/%s" % str(model.key.id())
     if isinstance(model, Wine):
         parent_key = model.key.parent()
-        return "/vintner/%s/wine/%s" % (str(parent_key.id()), str(model.key.id()))
+        return "/winery/%s/wine/%s" % (str(parent_key.id()), str(model.key.id()))
     return None
 
 
@@ -31,46 +31,46 @@ def add_links(dict_):
     """
         Adds a key with the location's URL to the dict
         >>> add_links({'location':'blerg' })
-        {...'vintner_location': '/vintner?location=blerg'...}
+        {...'winery_location': '/winery?location=blerg'...}
 
         Doesn't remove the original fields from the dict
         >>> add_links({'location':'blerg' })
         {...'location': 'blerg'...}
 
         >>> add_links({'location_fuzzy':'blerg'})
-        {...'vintner_location_fuzzy': '/vintner?location_fuzzy=blerg'...}
+        {...'winery_location_fuzzy': '/winery?location_fuzzy=blerg'...}
 
         >>> add_links({'country':'Canada'})
-        {...'vintner_country': '/vintner?country=Canada'...}
+        {...'winery_country': '/winery?country=Canada'...}
 
         >>> add_links({'country':'Canada', 'region':'British Columbia'})
-        {...'vintner_region': '/vintner?region=British Columbia'...}
+        {...'winery_region': '/winery?region=British Columbia'...}
 
         >>> add_links({'country':'Canada', 'region':'British Columbia'})
         {...'region_subregions': '/country/Canada/British Columbia'...}
 
         >>> add_links({'subregion':'Okanagan'})
-        {...'vintner_subregion': '/vintner?subregion=Okanagan'...}
+        {...'winery_subregion': '/winery?subregion=Okanagan'...}
 
     """
     if 'location' in dict_ and dict_['location']:
         location = dict_['location']
-        dict_['vintner_location'] = "/vintner?location=%s" % location
+        dict_['winery_location'] = "/winery?location=%s" % location
     if 'location_fuzzy' in dict_ and dict_['location_fuzzy']:
         location = dict_['location_fuzzy']
-        dict_['vintner_location_fuzzy'] = "/vintner?location_fuzzy=%s" % location
+        dict_['winery_location_fuzzy'] = "/winery?location_fuzzy=%s" % location
     if 'country' in dict_ and dict_['country']:
         country = dict_['country']
-        dict_['vintner_country'] = "/vintner?country=%s" % country
+        dict_['winery_country'] = "/winery?country=%s" % country
         dict_['country_regions'] = "/country/%s" % country
     if 'region' in dict_ and 'country' in dict_ and dict_['region']:
         region = dict_['region']
         country = dict_['country']
-        dict_['vintner_region'] = "/vintner?region=%s" % region
+        dict_['winery_region'] = "/winery?region=%s" % region
         dict_['region_subregions'] = "/country/%s/%s" % (country, region)
     if 'subregion' in dict_ and dict_['subregion']:
         subregion = dict_['subregion']
-        dict_['vintner_subregion'] = "/vintner?subregion=%s" % subregion
+        dict_['winery_subregion'] = "/winery?subregion=%s" % subregion
     return dict_
 
 
@@ -79,14 +79,14 @@ class MyHandler(webapp2.RequestHandler):
     def json(model):
         """
         Converts Models into dicts
-        >>> v = Vintner()
+        >>> v = Winery()
         >>> key = v.create({'name':'Winery'})
         >>> MyHandler.json(v)
         {...'name': 'Winery'...}
 
         Adds Model links
         >>> MyHandler.json(v)
-        {...'url': '/vintner/stub-key'...}
+        {...'url': '/winery/stub-key'...}
 
         Flattens json elements
         >>> MyHandler.json({'json':{'thing':'awesome'}})
@@ -94,7 +94,7 @@ class MyHandler(webapp2.RequestHandler):
 
         Adds dict links
         >>> MyHandler.json({'country':'Canada'})
-        {...'vintner_country': '/vintner?country=Canada'...}
+        {...'winery_country': '/winery?country=Canada'...}
         >>> MyHandler.json({'country':'Canada'})
         {...'country_regions': '/country/Canada'...}
         """
@@ -179,7 +179,7 @@ class LocationHandler(MyHandler):
     def get(self):
         if 'fuzzy' in self.request.GET:
             response = [{'location_fuzzy':location}
-                        for location in Vintner.all_fuzzy_locations()]
+                        for location in Winery.all_fuzzy_locations()]
             self.json_response(response)
         else:
             response = [{'location':location}
@@ -239,59 +239,59 @@ class SubRegionHandler(MyHandler):
                      for subregion in regions.subregions_for_country(country, region)]
         self.json_response(response)
 
-class VintnerBaseHandler(MyHandler):
+class WineryBaseHandler(MyHandler):
     """
-    GET /vintner : fetch a set of vintners
-    POST /vintner : create a vintner
+    GET /winery : fetch a set of winerys
+    POST /winery : create a winery
     """
 
     def get(self):
         """
-        /vintner?country=Canada
-        /vintner?region=British Columbia
-        /vintner?subregion=Okanagan Valley
-        /vintner?name="Black Hills Estate"
-        /vintner?location="Canada - British Columbia: Okanagan Valley"
-        /vintner?location_fuzzy="Somewhere"
+        /winery?country=Canada
+        /winery?region=British Columbia
+        /winery?subregion=Okanagan Valley
+        /winery?name="Black Hills Estate"
+        /winery?location="Canada - British Columbia: Okanagan Valley"
+        /winery?location_fuzzy="Somewhere"
         """
         #TODO: Compound Queries
         #TODO: convert location query into country/region/subregion query
         get = self.request.GET
         if 'subregion' in get:
-            self.json_response(Vintner.subregion_query(get['subregion']))
+            self.json_response(Winery.subregion_query(get['subregion']))
             return
         if 'region' in get:
-            self.json_response(Vintner.region_query(get['region']))
+            self.json_response(Winery.region_query(get['region']))
             return
         if 'country' in get:
-            self.json_response(Vintner.country_query(get['country']))
+            self.json_response(Winery.country_query(get['country']))
             return
         if 'name' in get:
-            self.json_response(Vintner.name_query(get['name']))
+            self.json_response(Winery.name_query(get['name']))
             return
         if 'location' in get:
-            self.json_response(Vintner.location_query(get['location']))
+            self.json_response(Winery.location_query(get['location']))
             return
         if 'location_fuzzy' in get:
-            self.json_response(Vintner.location_fuzzy_query(
+            self.json_response(Winery.location_fuzzy_query(
                                get['location_fuzzy']))
             return
         if 'verified_by' in get:
-            self.json_response(Vintner.verified_by_query(
+            self.json_response(Winery.verified_by_query(
                                get['verified_by']))
             return
         if 'verified' in get:
             verified = False
             if get['verified'].lower() == 'true':
                 verified = True
-            self.json_response(Vintner.verified_query(verified))
+            self.json_response(Winery.verified_query(verified))
             return
-        self.response.write("Vintner List Interface Goes Here")
+        self.response.write("Winery List Interface Goes Here")
 
     def post(self):
         """
 
-        >>> v = VintnerBaseHandler()
+        >>> v = WineryBaseHandler()
         >>> v.request.POST = {'name':'Winery'}
         >>> v.post()
         >>> v.response.content_type
@@ -302,29 +302,29 @@ class VintnerBaseHandler(MyHandler):
         """
         post = self.request.POST
 
-        vintner = Vintner()
+        winery = Winery()
         try:
-            key = vintner.create( post )
+            key = winery.create( post )
         except ValueError as e:
             self.response.status = "400 Bad Request"
             self.response.write(str(e))
             return
 
-        self.json_response(vintner)
+        self.json_response(winery)
 
 
-class VintnerHandler(MyHandler):
+class WineryHandler(MyHandler):
     """
-    /vintner/<id>
+    /winery/<id>
     """
 
-    def get(self, vintner_id):
+    def get(self, winery_id):
         """
-        >>> v = Vintner()
+        >>> v = Winery()
         >>> key = v.create({'name':'winery'})
         >>> ndb.Key.load_get(v )
 
-        >>> h = VintnerHandler()
+        >>> h = WineryHandler()
         >>> h.get('12345')
         >>> h.response.content_type
         'application/json'
@@ -332,22 +332,22 @@ class VintnerHandler(MyHandler):
         '{..."name": "winery",..."key":...}'
         """
 
-        vintner_key = ndb.Key(Vintner, int(vintner_id))
-        vintner = vintner_key.get()
-        if not vintner:
+        winery_key = ndb.Key(Winery, int(winery_id))
+        winery = winery_key.get()
+        if not winery:
             self.response.write("404 Not Found")
             self.response.status = "404 Not Found"
             return
 
-        self.json_response(vintner)
+        self.json_response(winery)
 
-    def post(self, vintner_id):
+    def post(self, winery_id):
         """
-        >>> v = Vintner()
+        >>> v = Winery()
         >>> key = v.create({'name':'winery'})
         >>> ndb.Key.load_get(v )
 
-        >>> h = VintnerHandler()
+        >>> h = WineryHandler()
         >>> h.request.POST = {'location':'Canada'}
         >>> h.post('12345')
         >>> h.response.content_type
@@ -362,52 +362,52 @@ class VintnerHandler(MyHandler):
 
         post = self.request.POST
 
-        vintner_key = ndb.Key(Vintner, int(vintner_id))
-        vintner = vintner_key.get()
+        winery_key = ndb.Key(Winery, int(winery_id))
+        winery = winery_key.get()
 
         try:
-            vintner.update(post)
+            winery.update(post)
         except YouNeedATokenForThat as e:
             self.response.write(str(e))
             self.response.status = "401 Unauthorized"
             return
 
-        self.json_response(vintner)
+        self.json_response(winery)
 
 
-class VintnerWineBaseHandler(MyHandler):
-    def get(self, vintner_id):
+class WineryWineBaseHandler(MyHandler):
+    def get(self, winery_id):
         """
-        /vintner/12345/wine => all wines for vintner
+        /winery/12345/wine => all wines for winery
         """
-        vintner_key = ndb.Key(Vintner, int(vintner_id))
-        vintner = vintner_key.get()
+        winery_key = ndb.Key(Winery, int(winery_id))
+        winery = winery_key.get()
 
-        if not vintner:
+        if not winery:
             self.response.write("404 Not Found")
             self.response.status = "404 Not Found"
             return
 
-        self.json_response(vintner.wine_query())
+        self.json_response(winery.wine_query())
 
-    def post(self, vintner_id):
+    def post(self, winery_id):
         """
-        POST /vintner/12345/wine => create a wine for vintner
+        POST /winery/12345/wine => create a wine for winery
         """
-        vintner_key = ndb.Key(Vintner, int(vintner_id))
-        vintner = vintner_key.get()
+        winery_key = ndb.Key(Winery, int(winery_id))
+        winery = winery_key.get()
 
-        if not vintner:
+        if not winery:
             self.response.status = "404 Not Found"
             self.response.write("404 Not found." )
             return
 
         post = self.request.POST
 
-        wine = Wine(parent=vintner_key)
+        wine = Wine(parent=winery_key)
         try:
-            key = wine.create( post, vintner )
-            vintner.update_rank()
+            key = wine.create( post, winery )
+            winery.update_rank()
         except ValueError as e:
             self.response.status = "400 Bad Request"
             self.response.write(str(e))
@@ -415,9 +415,9 @@ class VintnerWineBaseHandler(MyHandler):
 
         self.json_response(wine)
 
-class VintnerWineHandler(MyHandler):
-    def get(self, vintner_id, wine_id):
-        wine_key = ndb.Key(Vintner, int(vintner_id), Wine, int(wine_id))
+class WineryWineHandler(MyHandler):
+    def get(self, winery_id, wine_id):
+        wine_key = ndb.Key(Winery, int(winery_id), Wine, int(wine_id))
         wine = wine_key.get()
 
         if not wine:
@@ -427,13 +427,13 @@ class VintnerWineHandler(MyHandler):
 
         self.json_response(wine)
 
-    def post(self, vintner_id, wine_id):
-        vintner_key = ndb.Key(Vintner, int(vintner_id))
-        vintner = vintner_key.get()
-        wine_key = ndb.Key(Vintner, int(vintner_id), Wine, int(wine_id))
+    def post(self, winery_id, wine_id):
+        winery_key = ndb.Key(Winery, int(winery_id))
+        winery = winery_key.get()
+        wine_key = ndb.Key(Winery, int(winery_id), Wine, int(wine_id))
         wine = wine_key.get()
 
-        if not vintner or not wine:
+        if not winery or not wine:
             self.response.status = "404 Not Found"
             self.response.write("404 Not found." )
             return
@@ -441,7 +441,7 @@ class VintnerWineHandler(MyHandler):
         post = self.request.POST
 
         try:
-            wine.update(post, vintner)
+            wine.update(post, winery)
         except YouNeedATokenForThat as e:
             self.response.write(str(e))
             self.response.status = "401 Unauthorized"
@@ -468,9 +468,9 @@ routes = [
             (r'/country', CountryHandler),
             (r'/country/([\w\s\d%]+)', RegionHandler),
             (r'/country/([\w\s\d%]+)/([\w\s\d%]+)', SubRegionHandler),
-            (r'/vintner', VintnerBaseHandler),
-            (r'/vintner/(\d+)', VintnerHandler),
-            (r'/vintner/(\d+)/wine', VintnerWineBaseHandler),
-            (r'/vintner/(\d+)/wine/(\d+)', VintnerWineHandler),
+            (r'/winery', WineryBaseHandler),
+            (r'/winery/(\d+)', WineryHandler),
+            (r'/winery/(\d+)/wine', WineryWineBaseHandler),
+            (r'/winery/(\d+)/wine/(\d+)', WineryWineHandler),
             (r'/search', SearchHandler),
         ]

@@ -7,7 +7,6 @@ import json
 
 from stubs import ndb, uuid, debug
 
-#TODO : break models into multiple files?
 #TODO: Wine index searches
 #TODO: "Cache Invalidation" events
 #TODO: prime the database with sample data
@@ -127,7 +126,7 @@ class MyModel(ndb.Model):
                 and dict_[key] != {})
 
 
-class Vintner(MyModel):
+class Winery(MyModel):
     """
     Represents a single wine producer.
     """
@@ -186,12 +185,12 @@ class Vintner(MyModel):
 
     def create(self, post):
         """
-        Given a dict 'post' object containing vintner-y fields,
-        populate and put this Vintner object, return the key.
+        Given a dict 'post' object containing winery-y fields,
+        populate and put this Winery object, return the key.
 
         Throws a ValueError if no 'name' is included.
-        >>> v_for_vintner = Vintner()
-        >>> v_for_vintner.create({})
+        >>> v_for_winery = Winery()
+        >>> v_for_winery.create({})
         Traceback (most recent call last):
         ...
         ValueError: 'name' field is mandatory
@@ -199,13 +198,13 @@ class Vintner(MyModel):
         Basic use-case test.
         >>> location = 'Canada - British Columbia: Okanagan Valley'
         >>> post = {'name':'Super Winery', 'location':location }
-        >>> v_for_vintner = Vintner()
-        >>> database_key = v_for_vintner.create(post)
-        >>> v_for_vintner.country
+        >>> v_for_winery = Winery()
+        >>> database_key = v_for_winery.create(post)
+        >>> v_for_winery.country
         u'Canada'
-        >>> v_for_vintner.region
+        >>> v_for_winery.region
         u'British Columbia'
-        >>> v_for_vintner.subregion
+        >>> v_for_winery.subregion
         u'Okanagan Valley'
         >>> database_key.id()
         'stub-key'
@@ -213,26 +212,26 @@ class Vintner(MyModel):
         If the location isn't in our list, it goes into location_fuzzy
         >>> location = 'Other'
         >>> post = {'name':'Super Winery 2', 'location':location}
-        >>> v_for_vintner = Vintner()
-        >>> database_key = v_for_vintner.create(post)
-        >>> v_for_vintner.to_dict()
+        >>> v_for_winery = Winery()
+        >>> database_key = v_for_winery.create(post)
+        >>> v_for_winery.to_dict()
         {...'location_fuzzy': 'Other', ...}
-        >>> v_for_vintner.to_dict()['location_fuzzy']
+        >>> v_for_winery.to_dict()['location_fuzzy']
         'Other'
 
-        Vintners get a private token, which doesn't appear in to_dict()
-        >>> v_for_vintner.private_token
+        Winerys get a private token, which doesn't appear in to_dict()
+        >>> v_for_winery.private_token
         'stub-uuid'
-        >>> v_for_vintner.to_dict()['private_token']
+        >>> v_for_winery.to_dict()['private_token']
         Traceback (most recent call last):
         ...
         KeyError: 'private_token'
 
         Fields that we don't have database rows for go into the JSON.
         >>> post = {'name':'Super Winery 3', 'other_field':'glerg'}
-        >>> v_for_vintner = Vintner()
-        >>> database_key = v_for_vintner.create(post)
-        >>> v_for_vintner.json
+        >>> v_for_winery = Winery()
+        >>> database_key = v_for_winery.create(post)
+        >>> v_for_winery.json
         {'other_field': 'glerg'}
 
         """
@@ -249,7 +248,7 @@ class Vintner(MyModel):
 
         self.private_token = uuid.uuid4().hex
 
-        # special: vintners + verifieds are magic
+        # special: winerys + verifieds are magic
         if 'token' in post:
             self.verify(post['token'])
             del post['token']
@@ -266,24 +265,24 @@ class Vintner(MyModel):
 
     def update(self, post):
         """
-        Given a dict 'post' object containing vintner-y fields,
+        Given a dict 'post' object containing winery-y fields,
         update this object.
 
         Empty fields can always be updated. Fields cannot be overwritten
-        without a valid vintner or verifier token.
+        without a valid winery or verifier token.
 
         If this object has been verified, no changes may occur without
-        a valid vintner or verifier token.
+        a valid winery or verifier token.
 
         Throws a YouNeedATokenForThat error if the user tries something
         he doesn't have access to without a token
 
-        Let's create a Vintner to update...
+        Let's create a Winery to update...
         >>> location = 'Canada - British Columbia: Okanagan Valley'
         >>> post = {'name':'Super Winery' }
         >>> post['location_fuzzy'] = 'Somewhere'
         >>> post['json_thing'] = 'blerg'
-        >>> v = Vintner()
+        >>> v = Winery()
         >>> v.location
         <stubs.StringProperty ...>
         >>> database_key = v.create(post)
@@ -387,13 +386,13 @@ class Vintner(MyModel):
     def verify(self, token=None):
         """
         If the token doesn't exist, return False
-        If the token exists and belongs to the vintner, return "True",
+        If the token exists and belongs to the winery, return "True",
             and set self.verified and self.verified_by
         If the token exists and belongs to a verifier, return "True",
             and set self.verified and self.verified_by
         If the token exists but doesn't belong, return False
 
-        >>> v = Vintner()
+        >>> v = Winery()
         >>> v.create({'name':'Winery'})
         <stubs.Key object...>
         >>> v.private_token
@@ -405,7 +404,7 @@ class Vintner(MyModel):
         >>> v.verify('stub-uuid')
         True
         >>> v.verified_by
-        'Vintner'
+        'Winery'
         >>> v.verify('stub-token')
         True
         >>> v.verified
@@ -418,7 +417,7 @@ class Vintner(MyModel):
             return False
         if token == self.private_token:
             self.verified = True
-            self.verified_by = "Vintner"
+            self.verified_by = "Winery"
             return True
         else:
             user = VerifiedToken.authenticate(token)
@@ -431,7 +430,7 @@ class Vintner(MyModel):
     def calculate_rank(self, wines=[]):
         """
         A potentially expensive operation, to try to quantify
-        how much data this Vintner object contains.
+        how much data this Winery object contains.
         More is better.
         """
         rank = 0
@@ -461,7 +460,7 @@ class Vintner(MyModel):
         Never includes 'private_token'
         Tries to include 'key'
         """
-        dict_ = copy.deepcopy(super(Vintner, self).to_dict())
+        dict_ = copy.deepcopy(super(Winery, self).to_dict())
         if 'private_token' in dict_:
             del dict_['private_token']
         try:
@@ -478,7 +477,7 @@ class Vintner(MyModel):
         parse it into country, region, and subregion, and save
         those to the model.
 
-        >>> v = Vintner()
+        >>> v = Winery()
         >>> v.set_location("Canada - British Columbia: Okanagan Valley")
         >>> v.country
         u'Canada'
@@ -487,7 +486,7 @@ class Vintner(MyModel):
         >>> v.subregion
         u'Okanagan Valley'
 
-        >>> v = Vintner()
+        >>> v = Winery()
         >>> v.set_location("What is this I don't even")
         >>> v.country
         <stubs.StringProperty instance at ...>
@@ -509,10 +508,10 @@ class Vintner(MyModel):
 
     def queued_update(self):
         """
-        If a vintner is updated, it triggers potentially expensive operations
+        If a winery is updated, it triggers potentially expensive operations
         that are queued for later. They go in here.
         As of right now, they just happen after
-        a Vintner or Wine update, but we're moving them to a task queue, 
+        a Winery or Wine update, but we're moving them to a task queue, 
         I promise. 
         """
 
@@ -521,69 +520,69 @@ class Vintner(MyModel):
         self.put()
         #TODO: move queued_update to a task queue
 
-        #TODO: update search index for vintner and all wines here.
+        #TODO: update search index for winery and all wines here.
 
 
 
     @staticmethod
     def country_query(country):
-        qry = Vintner.query(Vintner.country == country)
-        results = qry.fetch(MAX_RESULTS, projection=[Vintner.name,
-                                            Vintner.verified, Vintner.location])
+        qry = Winery.query(Winery.country == country)
+        results = qry.fetch(MAX_RESULTS, projection=[Winery.name,
+                                            Winery.verified, Winery.location])
         return [x for x in results]
 
     @staticmethod
     def region_query(region):
-        qry = Vintner.query(Vintner.region == region)
-        results = qry.fetch(MAX_RESULTS, projection=[Vintner.name,
-                                            Vintner.verified, Vintner.location])
+        qry = Winery.query(Winery.region == region)
+        results = qry.fetch(MAX_RESULTS, projection=[Winery.name,
+                                            Winery.verified, Winery.location])
         return [x for x in results]
 
     @staticmethod
     def subregion_query(subregion):
-        qry = Vintner.query(Vintner.subregion == subregion)
-        results = qry.fetch(MAX_RESULTS, projection=[Vintner.name,
-                                            Vintner.verified, Vintner.location])
+        qry = Winery.query(Winery.subregion == subregion)
+        results = qry.fetch(MAX_RESULTS, projection=[Winery.name,
+                                            Winery.verified, Winery.location])
         return [x for x in results]
 
     @staticmethod
     def name_query(name):
-        qry = Vintner.query(Vintner.name == name)
-        results = qry.fetch(MAX_RESULTS, projection=[Vintner.verified,
-                                                     Vintner.location])
+        qry = Winery.query(Winery.name == name)
+        results = qry.fetch(MAX_RESULTS, projection=[Winery.verified,
+                                                     Winery.location])
         return [x for x in results]
 
     @staticmethod
     def verified_query(verified):
-        qry = Vintner.query(Vintner.verified == verified)
-        results = qry.fetch(MAX_RESULTS, projection=[Vintner.name,
-                                                     Vintner.location])
+        qry = Winery.query(Winery.verified == verified)
+        results = qry.fetch(MAX_RESULTS, projection=[Winery.name,
+                                                     Winery.location])
         return [x for x in results]
 
     @staticmethod
     def verified_by_query(verified_by):
-        qry = Vintner.query(Vintner.verified_by == verified_by)
-        results = qry.fetch(MAX_RESULTS, projection=[Vintner.name,
-                                                     Vintner.location])
+        qry = Winery.query(Winery.verified_by == verified_by)
+        results = qry.fetch(MAX_RESULTS, projection=[Winery.name,
+                                                     Winery.location])
         return [x for x in results]
 
     @staticmethod
     def location_query(location):
-        qry = Vintner.query(Vintner.location == location)
-        results = qry.fetch(MAX_RESULTS, projection=[Vintner.name,
-                                                     Vintner.verified])
+        qry = Winery.query(Winery.location == location)
+        results = qry.fetch(MAX_RESULTS, projection=[Winery.name,
+                                                     Winery.verified])
         return [x for x in results]
 
     @staticmethod
     def location_fuzzy_query(location):
-        qry = Vintner.query(Vintner.location_fuzzy == location)
-        results = qry.fetch(MAX_RESULTS, projection=[Vintner.name,
-                                                     Vintner.verified])
+        qry = Winery.query(Winery.location_fuzzy == location)
+        results = qry.fetch(MAX_RESULTS, projection=[Winery.name,
+                                                     Winery.verified])
         return [x for x in results]
 
     @staticmethod
     def all_fuzzy_locations():
-        qry = Vintner.query(Vintner.location_fuzzy != None)
+        qry = Winery.query(Winery.location_fuzzy != None)
         results = qry.fetch(MAX_RESULTS)
         return [x.location_fuzzy for x in results]
 
@@ -594,7 +593,7 @@ class Vintner(MyModel):
 
 
 class Wine(MyModel):
-    # Parent: Vintner
+    # Parent: Winery
     year = ndb.IntegerProperty()
     name = ndb.StringProperty()
     winetype = ndb.StringProperty(required=True, choices=wine_types.types)
@@ -633,10 +632,10 @@ class Wine(MyModel):
     def has_json(self):
         return self.has_key('json')
 
-    def create(self, post, vintner):
+    def create(self, post, winery):
         """
 
-        >>> v = Vintner()
+        >>> v = Winery()
         >>> v_key = v.create({'name':'Winery'})
         >>> w = Wine(parent=v_key)
         >>> post = {}
@@ -659,7 +658,7 @@ class Wine(MyModel):
         >>> w.verified
         True
         >>> w.verified_by
-        'Vintner'
+        'Winery'
 
         """
         name = None
@@ -704,7 +703,7 @@ class Wine(MyModel):
         token = None
         if 'token' in post:
             token = post['token']
-            self.verify(token, vintner)
+            self.verify(token, winery)
             del post['token']
 
         json = tidy_up_the_post_object(post)
@@ -713,9 +712,9 @@ class Wine(MyModel):
         key = self.put()
         return key
 
-    def update(self, post, vintner):
+    def update(self, post, winery):
         """
-        >>> v = Vintner()
+        >>> v = Winery()
         >>> v_key = v.create({"name":"Winery"})
         >>> w = Wine(parent=v_key)
         >>> w_key = w.create({"winetype":"Red", "year":"2010"}, v)
@@ -772,7 +771,7 @@ class Wine(MyModel):
         can_edit_fields = False
         if 'token' in post:
             token = post['token']
-            can_edit_fields = self.verify(token, vintner)
+            can_edit_fields = self.verify(token, winery)
             del post['token']
 
         def can_edit_field(field_name):
@@ -837,7 +836,7 @@ class Wine(MyModel):
             self.json = json
 
         key = self.put()
-        vintner.queued_update()
+        winery.queued_update()
         return None
 
     def calculate_rank(self):
@@ -857,7 +856,7 @@ class Wine(MyModel):
                 rank += 1
         return rank
 
-    def verify(self, token=None, vintner=None):
+    def verify(self, token=None, winery=None):
         """
         Sets self.verified and self.verified_by,
         True if the token is valid
@@ -865,9 +864,9 @@ class Wine(MyModel):
         """
         if not token:
             return False
-        if vintner and token == vintner.private_token:
+        if winery and token == winery.private_token:
             self.verified = True
-            self.verified_by = "Vintner"
+            self.verified_by = "Winery"
             return True
         else:
             user = VerifiedToken.authenticate(token)
@@ -879,6 +878,6 @@ class Wine(MyModel):
 
 
 class Place(ndb.Model):
-    # Parent: Vintner
+    # Parent: Winery
     address = ndb.TextProperty(indexed=False)
     geopt = ndb.TextProperty(indexed=False)
