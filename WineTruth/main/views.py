@@ -27,53 +27,6 @@ def get_url(model):
     return None
 
 
-def add_links(dict_):
-    """
-        Adds a key with the location's URL to the dict
-        >>> add_links({'location':'blerg' })
-        {...'winery_location': '/winery?location=blerg'...}
-
-        Doesn't remove the original fields from the dict
-        >>> add_links({'location':'blerg' })
-        {...'location': 'blerg'...}
-
-        >>> add_links({'location_fuzzy':'blerg'})
-        {...'winery_location_fuzzy': '/winery?location_fuzzy=blerg'...}
-
-        >>> add_links({'country':'Canada'})
-        {...'winery_country': '/winery?country=Canada'...}
-
-        >>> add_links({'country':'Canada', 'region':'British Columbia'})
-        {...'winery_region': '/winery?region=British Columbia'...}
-
-        >>> add_links({'country':'Canada', 'region':'British Columbia'})
-        {...'region_subregions': '/country/Canada/British Columbia'...}
-
-        >>> add_links({'subregion':'Okanagan'})
-        {...'winery_subregion': '/winery?subregion=Okanagan'...}
-
-    """
-    if 'location' in dict_ and dict_['location']:
-        location = dict_['location']
-        dict_['winery_location'] = "/winery?location=%s" % location
-    if 'location_fuzzy' in dict_ and dict_['location_fuzzy']:
-        location = dict_['location_fuzzy']
-        dict_['winery_location_fuzzy'] = "/winery?location_fuzzy=%s" % location
-    if 'country' in dict_ and dict_['country']:
-        country = dict_['country']
-        dict_['winery_country'] = "/winery?country=%s" % country
-        dict_['country_regions'] = "/country/%s" % country
-    if 'region' in dict_ and 'country' in dict_ and dict_['region']:
-        region = dict_['region']
-        country = dict_['country']
-        dict_['winery_region'] = "/winery?region=%s" % region
-        dict_['region_subregions'] = "/country/%s/%s" % (country, region)
-    if 'subregion' in dict_ and dict_['subregion']:
-        subregion = dict_['subregion']
-        dict_['winery_subregion'] = "/winery?subregion=%s" % subregion
-    return dict_
-
-
 class MyHandler(webapp2.RequestHandler):
     @staticmethod
     def json(model):
@@ -91,12 +44,6 @@ class MyHandler(webapp2.RequestHandler):
         Flattens json elements
         >>> MyHandler.json({'json':{'thing':'awesome'}})
         {...'thing': 'awesome'...}
-
-        Adds dict links
-        >>> MyHandler.json({'country':'Canada'})
-        {...'winery_country': '/winery?country=Canada'...}
-        >>> MyHandler.json({'country':'Canada'})
-        {...'country_regions': '/country/Canada'...}
         """
         try:
             url = get_url(model)
@@ -108,7 +55,6 @@ class MyHandler(webapp2.RequestHandler):
                 for key, value in object_['json'].iteritems():
                     object_[key] = value
                 del object_['json']
-            object_ = add_links(object_)
             if url:
                 object_['url'] = url
             return object_
