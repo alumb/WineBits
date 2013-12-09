@@ -4,6 +4,9 @@ install:
 run:
 	~/google_appengine/dev_appserver.py . --host=0.0.0.0 
 
+runclean:
+	~/google_appengine/dev_appserver.py . --host=0.0.0.0 --clear_datastore=yes
+
 test:
 	python `which nosetests`
 
