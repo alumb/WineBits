@@ -19,39 +19,6 @@ else:
 
 UPDATE_BATCH_SIZE = 5
 
-class VerifiedToken(ndb.Model):
-    name = ndb.StringProperty(required=True)
-    token = ndb.StringProperty(required=True)
-    created_by = ndb.StringProperty(required=True, indexed=False)
-
-    @staticmethod
-    def classam():
-        qry = VerifiedToken.query(VerifiedToken.name == 'classam')
-        results = qry.fetch(1)
-        if len(results) > 0:
-            return results[0].token
-        return False
-
-    @staticmethod
-    def new_token(name, created_by):
-        v = VerifiedToken(name=name, token=uuid.uuid4().hex,
-                            created_by=created_by)
-        v.put()
-        return v.token
-
-    @staticmethod
-    def authenticate(token):
-        if debug and token == 'stub-token':
-            return "stub-user"
-        else:
-            qry = VerifiedToken.query(VerifiedToken.token == token)
-            results = qry.fetch(1, projection=[VerifiedToken.name])
-            results = [x for x in results]
-            if len(results) > 0:
-                return results[0].name
-            return False
-
-
 
 class YouNeedATokenForThat(Exception):
     pass
@@ -405,12 +372,6 @@ class Winery(MyModel):
         True
         >>> v.verified_by
         'Winery'
-        >>> v.verify('stub-token')
-        True
-        >>> v.verified
-        True
-        >>> v.verified_by
-        'stub-user'
 
         """
         if not token:
@@ -419,12 +380,6 @@ class Winery(MyModel):
             self.verified = True
             self.verified_by = "Winery"
             return True
-        else:
-            user = VerifiedToken.authenticate(token)
-            if user:
-                self.verified = True
-                self.verified_by = user
-                return True
         return False
 
     def calculate_rank(self, wines=[]):
@@ -868,12 +823,6 @@ class Wine(MyModel):
             self.verified = True
             self.verified_by = "Winery"
             return True
-        else:
-            user = VerifiedToken.authenticate(token)
-            if user:
-                self.verified = True
-                self.verified_by = user
-                return True
         return False
 
 

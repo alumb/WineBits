@@ -1,4 +1,4 @@
-from models import Winery, Wine, YouNeedATokenForThat, VerifiedToken
+from models import Winery, Wine, YouNeedATokenForThat
 import regions
 import wine_types
 
@@ -131,43 +131,6 @@ class MyHandler(webapp2.RequestHandler):
             self.response.write( json.dumps(object_, indent=2 ))
         else:
             self.response.write( json.dumps(object_) )
-
-
-class TokenHandler(MyHandler):
-    """
-    Create a token for person.
-
-    Bootstrap rule:
-    If no 'classam' token exists in the system, one can be created
-    without a token.
-
-    Any further tokens must be created by a user with a valid token.
-
-    GET /token/person
-    """
-    def post(self, name):
-
-        post = self.request.POST
-
-        if not VerifiedToken.classam():
-            token = VerifiedToken.new_token('classam', 'bootstrap')
-            self.response.write(token)
-            return
-
-        if not 'token' in post:
-            self.response.status = "401 Unauthorized"
-            self.response.write("401 Unauthorized")
-            return
-
-        user = VerifiedToken.authenticate(post['token'])
-        if not user:
-            self.response.status = "401 Unauthorized"
-            self.response.write("401 Unauthorized")
-            return
-
-        token = VerifiedToken.new_token(name, user)
-        self.response.write(token)
-
 
 
 class LocationHandler(MyHandler):
@@ -460,7 +423,6 @@ class SearchHandler(MyHandler):
 
 
 routes = [
-            (r'/token/([\w\s\d])+', TokenHandler),
             (r'/location', LocationHandler),
             (r'/winetype', WineTypeHandler),
             (r'/varietal', VarietalHandler),
