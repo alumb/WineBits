@@ -407,7 +407,6 @@ class WineryWineBaseHandler(MyHandler):
         wine = Wine(parent=winery_key)
         try:
             key = wine.create( post, winery )
-            winery.update_rank()
         except ValueError as e:
             self.response.status = "400 Bad Request"
             self.response.write(str(e))
