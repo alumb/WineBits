@@ -1,4 +1,6 @@
-from models import Winery, Wine, YouNeedATokenForThat
+from models.base import YouNeedATokenForThat
+from models.winery import Winery
+from models.wine import Wine
 import regions
 import wine_types
 
@@ -297,7 +299,7 @@ class WineryWineBaseHandler(MyHandler):
             self.response.status = "404 Not Found"
             return
 
-        self.json_response(winery.wine_query())
+        self.json_response(Wine.wine_query(winery))
 
     def post(self, winery_id):
         """

@@ -1,99 +1,11 @@
 import regions
-import wine_types
+from models.base import BaseModel, YouNeedATokenForThat
 
-import os
 import copy
-import json
+from stubs import ndb, uuid
+from constants import MAX_RESULTS
 
-from stubs import ndb, uuid, debug
-
-#TODO: Wine index searches
-#TODO: "Cache Invalidation" events
-#TODO: prime the database with sample data
-
-
-if debug:
-    MAX_RESULTS = 100
-else:
-    MAX_RESULTS = 5000
-
-UPDATE_BATCH_SIZE = 5
-
-
-class YouNeedATokenForThat(Exception):
-    pass
-
-
-def tidy_up_the_post_object(post):
-    post = add_json_fields_to_the_post_object(post)
-    post = remove_reserved_fields_from_the_post_object(post)
-    new_post = {}
-    for key, value in post.iteritems():
-        try:
-            new_post[key] = json.loads(value)
-        except ValueError:
-            new_post[key] = value
-        except TypeError:
-            new_post[key] = value
-    return new_post
-
-
-def add_json_fields_to_the_post_object(post):
-    # Add JSON fields directly to the post object
-    if 'json' in post:
-        for key, value in post['json'].iteritems():
-            post[key] = value
-        del post['json']
-    return post
-
-
-def remove_reserved_fields_from_the_post_object(post):
-    if 'name' in post:
-        del post['name']
-    if 'rank' in post:
-        del post['rank']
-    if 'country' in post:
-        del post['country']
-    if 'region' in post:
-        del post['region']
-    if 'subregion' in post:
-        del post['subregion']
-    if 'verified' in post:
-        del post['verified']
-    if 'verified_by' in post:
-        del post['verified_by']
-    if 'private_token' in post:
-        del post['private_token']
-    if 'token' in post:
-        del post['token']
-    if 'key' in post:
-        del post['key']
-    if 'link' in post:
-        del post['link']
-    if 'year' in post:
-        del post['year']
-    if 'winetype' in post:
-        del post['winetype']
-    if 'varietal' in post:
-        del post['varietal']
-    if 'upc' in post:
-        del post['upc']
-    if 'json' in post:
-        del post['json']
-    return post
-
-
-class MyModel(ndb.Model):
-    """
-    Utility functions
-    """
-    def has_key(self, key):
-        dict_ = self.to_dict()
-        return (key in dict_ and dict_[key] and dict_[key] != ""
-                and dict_[key] != {})
-
-
-class Winery(MyModel):
+class Winery(BaseModel):
     """
     Represents a single wine producer.
     """
@@ -222,7 +134,7 @@ class Winery(MyModel):
 
         # having taken care of 'name' and 'location',
         # we wedge everything else into the JSON
-        json = tidy_up_the_post_object(post)
+        json = BaseModel.tidy_up_the_post_object(post)
         self.json = json
 
         self.rank = self.calculate_rank()
@@ -330,7 +242,7 @@ class Winery(MyModel):
                 raise field_edit_error('location')
             del post['location']
 
-        json = tidy_up_the_post_object(post)
+        json = BaseModel.tidy_up_the_post_object(post)
 
         if self.has_json:
             new_json = self.to_dict()['json']
@@ -348,7 +260,6 @@ class Winery(MyModel):
             self.json = json
 
         self.put()
-        self.queued_update()
 
     def verify(self, token=None):
         """
@@ -461,23 +372,6 @@ class Winery(MyModel):
             if subregion:
                 self.subregion = subregion
 
-    def queued_update(self):
-        """
-        If a winery is updated, it triggers potentially expensive operations
-        that are queued for later. They go in here.
-        As of right now, they just happen after
-        a Winery or Wine update, but we're moving them to a task queue, 
-        I promise. 
-        """
-
-        wines = self.wine_query()
-        self.rank = self.calculate_rank(wines)
-        self.put()
-        #TODO: move queued_update to a task queue
-
-        #TODO: update search index for winery and all wines here.
-
-
 
     @staticmethod
     def country_query(country):
@@ -540,293 +434,3 @@ class Winery(MyModel):
         qry = Winery.query(Winery.location_fuzzy != None)
         results = qry.fetch(MAX_RESULTS)
         return [x.location_fuzzy for x in results]
-
-    def wine_query(self):
-        qry = Wine.query(ancestor=self.key)
-        results = qry.fetch(MAX_RESULTS)
-        return [x for x in results]
-
-
-class Wine(MyModel):
-    # Parent: Winery
-    year = ndb.IntegerProperty()
-    name = ndb.StringProperty()
-    winetype = ndb.StringProperty(required=True, choices=wine_types.types)
-    varietal = ndb.StringProperty()
-    upc = ndb.StringProperty()
-
-    @property
-    def has_year(self):
-        return self.has_key('year')
-
-    @property
-    def has_name(self):
-        return self.has_key('name')
-
-    @property
-    def has_winetype(self):
-        return self.has_key('winetype')
-
-    @property
-    def has_varietal(self):
-        return self.has_key('varietal')
-
-    @property
-    def has_upc(self):
-        return self.has_key('upc')
-
-    verified = ndb.BooleanProperty(default=False)
-    verified_by = ndb.StringProperty()
-
-    json = ndb.JsonProperty(indexed=False)
-    # JSON properties encompass the bits that might want to be tracked
-    # but are too fiddly to keep track of regularly, like
-    # bud_break, veraison, oak_regime, barrel_age, harvest_date,
-    # bottling_date, alcohol_content, winemaker_notes, vineyard_notes...
-
-    def has_json(self):
-        return self.has_key('json')
-
-    def create(self, post, winery):
-        """
-
-        >>> v = Winery()
-        >>> v_key = v.create({'name':'Winery'})
-        >>> w = Wine(parent=v_key)
-        >>> post = {}
-        >>> post['name'] = 'Red Character'
-        >>> post['varietal'] = 'Blend'
-        >>> post['winetype'] = 'Red'
-        >>> post['upc'] = '1234567890'
-        >>> post['blend'] = ['Merlot', 'Cabernet Franc']
-        >>> post['token'] = "stub-uuid"
-        >>> w_key = w.create(post, v)
-
-        >>> w.name
-        'Red Character'
-        >>> w.varietal
-        'Blend'
-        >>> w.winetype
-        'Red'
-        >>> w.to_dict()['json']['blend']
-        ['Merlot', 'Cabernet Franc']
-        >>> w.verified
-        True
-        >>> w.verified_by
-        'Winery'
-
-        """
-        name = None
-        if 'name' in post:
-            name = post['name']
-            self.name = name
-            del post['name']
-
-        year = None
-        if 'year' in post:
-            year = int(post['year'])
-            self.year = year
-            del post['year']
-
-        winetype = None
-        if 'winetype' in post:
-            winetype = post['winetype']
-            if not winetype in wine_types.types:
-                raise ValueError("Invalid Wine Type: " + str(winetype))
-            else:
-                self.winetype = winetype
-                del post['winetype']
-
-        varietal = None
-        if 'varietal' in post:
-            varietal = post['varietal']
-            self.varietal = varietal
-            del post['varietal']
-
-        upc = None
-        if 'upc' in post:
-            upc = post['upc']
-            del post['upc']
-
-        if not winetype:
-            raise ValueError("You must provide a winetype")
-
-        if not name and not year and not varietal and not upc:
-            raise ValueError("You must provide a name, year, "+
-                             " varietal, or upc.")
-
-        token = None
-        if 'token' in post:
-            token = post['token']
-            self.verify(token, winery)
-            del post['token']
-
-        json = tidy_up_the_post_object(post)
-        self.json = json
-
-        key = self.put()
-        return key
-
-    def update(self, post, winery):
-        """
-        >>> v = Winery()
-        >>> v_key = v.create({"name":"Winery"})
-        >>> w = Wine(parent=v_key)
-        >>> w_key = w.create({"winetype":"Red", "year":"2010"}, v)
-
-        The base case.
-        >>> w.update({"name":"Red Character", "terroir":"Good"}, v)
-        >>> w.to_dict()["name"]
-        'Red Character'
-
-        >>> w.to_dict()["json"]["terroir"]
-        'Good'
-
-        >>> w2 = Wine(parent=v_key)
-        >>> w2.update({"winetype":"White", "year":"2011"}, v)
-        >>> w2.to_dict()["winetype"]
-        'White'
-
-        >>> w2.to_dict()["year"]
-        2011
-
-        >>> w.update({"varietal":"Blend"}, v)
-        >>> w.to_dict()["varietal"]
-        'Blend'
-
-        >>> w.update({"upc":"123456789"}, v)
-        >>> w.to_dict()["upc"]
-        '123456789'
-
-        You can't replace a field.
-        >>> w.update({"winetype":"White"}, v)
-        Traceback (most recent call last):
-        ...
-        YouNeedATokenForThat...
-
-        >>> w.update({"terroir": "at danger lake!"}, v)
-        Traceback (most recent call last):
-        ...
-        YouNeedATokenForThat...
-
-        Should be fine if you update a thing with itself.
-        >>> w.update({"winetype":"Red"}, v)
-        >>> w.update({"terroir":"Good"}, v)
-
-        You can update whatever you like if you have a token.
-        >>> w.update({"winetype":"White", "token":"stub-uuid"}, v)
-        >>> w.to_dict()["winetype"]
-        'White'
-
-        """
-        def field_edit_error(fieldname):
-            return YouNeedATokenForThat(("You can't edit fields that already" +
-                                          " exist: %s" % fieldname))
-
-        can_edit_fields = False
-        if 'token' in post:
-            token = post['token']
-            can_edit_fields = self.verify(token, winery)
-            del post['token']
-
-        def can_edit_field(field_name):
-            if field_name in post:
-                if not self.has_key(field_name):
-                    return True
-                if post[field_name] == str(self.to_dict()[field_name]):
-                    return True
-                if can_edit_fields:
-                    return True
-                raise field_edit_error(field_name)
-            else:
-                return False
-
-        name = None
-        if can_edit_field('name'):
-            name = post['name']
-            self.name = name
-            del post['name']
-
-        year = None
-        if can_edit_field('year'):
-            year = int(post['year'])
-            self.year = year
-            del post['year']
-
-        winetype = None
-        if can_edit_field('winetype'):
-            winetype = post['winetype']
-            if not winetype in wine_types.types:
-                raise ValueError("Invalid Wine Type: " + str(winetype))
-            else:
-                self.winetype = winetype
-                del post['winetype']
-
-        varietal = None
-        if can_edit_field('varietal'):
-            varietal = post['varietal']
-            self.varietal = varietal
-            del post['varietal']
-
-        upc = None
-        if can_edit_field('upc'):
-            upc = post['upc']
-            self.upc = upc
-            del post['upc']
-
-        json = tidy_up_the_post_object(post)
-        if 'json' in self.to_dict():
-            new_json = self.to_dict()['json']
-            for key, value in json.iteritems():
-                if key in new_json and can_edit_fields:
-                    new_json[key] = value
-                if not (key in new_json):
-                    new_json[key] = value
-                if key in new_json and new_json[key] == value:
-                    pass
-                else:
-                    raise field_edit_error(key)
-            self.json = new_json
-        else:
-            self.json = json
-
-        key = self.put()
-        winery.queued_update()
-        return None
-
-    def calculate_rank(self):
-        rank = 0
-        if self.has_year:
-            rank += 2
-        if self.has_name:
-            rank += 2
-        if self.has_winetype:
-            rank += 2
-        if self.has_varietal:
-            rank += 4
-        if self.has_upc:
-            rank += 8
-        if self.has_json:
-            for key in self.to_dict()['json']:
-                rank += 1
-        return rank
-
-    def verify(self, token=None, winery=None):
-        """
-        Sets self.verified and self.verified_by,
-        True if the token is valid
-        False if not
-        """
-        if not token:
-            return False
-        if winery and token == winery.private_token:
-            self.verified = True
-            self.verified_by = "Winery"
-            return True
-        return False
-
-
-class Place(ndb.Model):
-    # Parent: Winery
-    address = ndb.TextProperty(indexed=False)
-    geopt = ndb.TextProperty(indexed=False)

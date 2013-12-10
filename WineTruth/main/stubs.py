@@ -5,7 +5,6 @@ and provides featureless stubs otherwise for testing.
 
 currently mocked:
 
-debug
 ndb
 webapp2
 uuid
