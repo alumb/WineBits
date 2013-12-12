@@ -1,8 +1,8 @@
 import wine_types
 from models.base import BaseModel, YouNeedATokenForThat
 from models.winery import Winery
-
-from stubs import ndb
+from constants import MAX_RESULTS
+from stubs import ndb, search
 
 class Wine(BaseModel):
     # Parent: Winery
@@ -34,6 +34,14 @@ class Wine(BaseModel):
 
     verified = ndb.BooleanProperty(default=False)
     verified_by = ndb.StringProperty()
+    
+    @property
+    def has_verified(self):
+        return self.has_key('verified')
+
+    @property
+    def has_verified_by(self):
+        return self.has_key('verified_by')
 
     json = ndb.JsonProperty(indexed=False)
     # JSON properties encompass the bits that might want to be tracked
@@ -124,7 +132,7 @@ class Wine(BaseModel):
         key = self.put()
         return key
 
-    def update(self, post, winery):
+    def modify(self, post, winery):
         """
         >>> v = Winery()
         >>> v_key = v.create({"name":"Winery"})
@@ -132,7 +140,7 @@ class Wine(BaseModel):
         >>> w_key = w.create({"winetype":"Red", "year":"2010"}, v)
 
         The base case.
-        >>> w.update({"name":"Red Character", "terroir":"Good"}, v)
+        >>> w.modify({"name":"Red Character", "terroir":"Good"}, v)
         >>> w.to_dict()["name"]
         'Red Character'
 
@@ -140,38 +148,38 @@ class Wine(BaseModel):
         'Good'
 
         >>> w2 = Wine(parent=v_key)
-        >>> w2.update({"winetype":"White", "year":"2011"}, v)
+        >>> w2.modify({"winetype":"White", "year":"2011"}, v)
         >>> w2.to_dict()["winetype"]
         'White'
 
         >>> w2.to_dict()["year"]
         2011
 
-        >>> w.update({"varietal":"Blend"}, v)
+        >>> w.modify({"varietal":"Blend"}, v)
         >>> w.to_dict()["varietal"]
         'Blend'
 
-        >>> w.update({"upc":"123456789"}, v)
+        >>> w.modify({"upc":"123456789"}, v)
         >>> w.to_dict()["upc"]
         '123456789'
 
         You can't replace a field.
-        >>> w.update({"winetype":"White"}, v)
+        >>> w.modify({"winetype":"White"}, v)
         Traceback (most recent call last):
         ...
         YouNeedATokenForThat...
 
-        >>> w.update({"terroir": "at danger lake!"}, v)
+        >>> w.modify({"terroir": "at danger lake!"}, v)
         Traceback (most recent call last):
         ...
         YouNeedATokenForThat...
 
         Should be fine if you update a thing with itself.
-        >>> w.update({"winetype":"Red"}, v)
-        >>> w.update({"terroir":"Good"}, v)
+        >>> w.modify({"winetype":"Red"}, v)
+        >>> w.modify({"terroir":"Good"}, v)
 
         You can update whatever you like if you have a token.
-        >>> w.update({"winetype":"White", "token":"stub-uuid"}, v)
+        >>> w.modify({"winetype":"White", "token":"stub-uuid"}, v)
         >>> w.to_dict()["winetype"]
         'White'
 
@@ -252,6 +260,8 @@ class Wine(BaseModel):
 
     def calculate_rank(self):
         rank = 0
+        if self.has_verified:
+            rank += 24
         if self.has_year:
             rank += 2
         if self.has_name:
@@ -280,6 +290,71 @@ class Wine(BaseModel):
             self.verified_by = "Winery"
             return True
         return False
+    
+    def update(self, winery):
+        # get all wines for this winery
+        wines = Wine.winery_query(winery)
+        # remove the wine we just edited
+        wines = [wine for wine in wines if self.key.id() != wine.key.id()]
+        # add the wine we just edited
+        wines.append(self)
+        
+        # recalculate the winery rank
+        winery.update(wines)
+        winery.put()
+
+        # recreate search indexes for every wine under the winery
+        #   with the new winery rank as their search index. 
+        for wine in wines:
+            wine.create_search_index(winery)
+
+    def create_search_index(self, winery):
+        """
+        create a search index for this wine
+        """
+        if not self.key:
+            raise ArgumentException("Can't update without a key.")
+        
+        index = search.Index(name="wines")
+        
+        searchkey = str(self.key.id())
+        # search rank is winery rank + individual rank
+        rank = winery.to_dict()['rank'] + self.calculate_rank()
+        
+        fields = []
+        
+        if self.has_year:
+            year = self.to_dict()['year']
+            fields.append(search.NumberField(name='year', value=year))
+        
+        if self.has_name:
+            name = self.to_dict()['name']
+            fields.append(search.TextField(name='name', value=name))
+        
+        if self.has_winetype:
+            winetype = self.to_dict()['winetype']
+            fields.append(search.AtomField(name='winetype', value=winetype))
+        
+        if self.has_varietal:
+            varietal = self.to_dict()['varietal']
+            fields.append(search.AtomField(name='varietal', value=varietal))
+        
+        if self.has_upc:
+            upc = self.to_dict()['upc']
+            fields.append(search.TextField(name='upc', value=upc))
+        
+        fields.append(search.AtomField(name='verified', 
+                                       value=str(self.has_verified)))
+        
+        fields.append(search.TextField(name='key', 
+                                       value=str(self.key)))
+        
+        searchdoc = search.Document(doc_id = searchkey, 
+                                    fields=fields, 
+                                    rank=rank) 
+        
+        index.put(searchdoc)
+        return None
 
     @staticmethod
     def winery_query(winery):

@@ -64,7 +64,7 @@ def create_random_wine(connection, winery_url):
         'name':name, 
         'year':year,
         'winetype':winetype, 
-        'varietal':varietal
+        'varietal':varietal.encode("ascii", "ignore")
     }
     return post_wine(connection, winery_url, post)
 

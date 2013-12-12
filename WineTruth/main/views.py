@@ -215,7 +215,8 @@ class WineryBaseHandler(MyHandler):
 
         winery = Winery()
         try:
-            key = winery.create( post )
+            key = winery.create(post)
+            winery.update(post)
         except ValueError as e:
             self.response.status = "400 Bad Request"
             self.response.write(str(e))
@@ -277,6 +278,7 @@ class WineryHandler(MyHandler):
         winery = winery_key.get()
 
         try:
+            winery.modify(post)
             winery.update(post)
         except YouNeedATokenForThat as e:
             self.response.write(str(e))
@@ -318,6 +320,7 @@ class WineryWineBaseHandler(MyHandler):
         wine = Wine(parent=winery_key)
         try:
             key = wine.create( post, winery )
+            wine.update(winery)
         except ValueError as e:
             self.response.status = "400 Bad Request"
             self.response.write(str(e))
@@ -351,7 +354,9 @@ class WineryWineHandler(MyHandler):
         post = self.request.POST
 
         try:
-            wine.update(post, winery)
+            wine.modify(post, winery)
+            wine.update(winery)
+
         except YouNeedATokenForThat as e:
             self.response.write(str(e))
             self.response.status = "401 Unauthorized"

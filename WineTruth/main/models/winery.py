@@ -1,8 +1,8 @@
+import copy
+
 import regions
 from models.base import BaseModel, YouNeedATokenForThat
-
-import copy
-from stubs import ndb, uuid
+from stubs import ndb, uuid, search
 from constants import MAX_RESULTS
 
 class Winery(BaseModel):
@@ -142,7 +142,7 @@ class Winery(BaseModel):
         key = self.put()
         return key
 
-    def update(self, post):
+    def modify(self, post):
         """
         Given a dict 'post' object containing winery-y fields,
         update this object.
@@ -169,7 +169,7 @@ class Winery(BaseModel):
         And update the location:
         >>> new_post = {'location':location}
         >>> new_post['json_other_thing'] = 'blorg'
-        >>> v.update(new_post)
+        >>> v.modify(new_post)
         >>> v.country
         u'Canada'
         >>> v.to_dict()['json']['json_other_thing']
@@ -177,13 +177,13 @@ class Winery(BaseModel):
 
         Updates of existing fields should fail.
         >>> other_location = 'Canada - British Columbia: Similkameen Valley'
-        >>> v.update({'location':other_location})
+        >>> v.modify({'location':other_location})
         Traceback (most recent call last):
         ...
         YouNeedATokenForThat...
 
         Updates of json fields that already exist should fail.
-        >>> v.update({'json_other_thing':'beep boop'})
+        >>> v.modify({'json_other_thing':'beep boop'})
         Traceback (most recent call last):
         ...
         YouNeedATokenForThat...
@@ -191,17 +191,17 @@ class Winery(BaseModel):
         'blorg'
 
         Updating a thing with itself should be fine.
-        >>> v.update({'name':'Super Winery'})
-        >>> v.update({'json_other_thing':'blorg'})
-        >>> v.update({'location':location})
+        >>> v.modify({'name':'Super Winery'})
+        >>> v.modify({'json_other_thing':'blorg'})
+        >>> v.modify({'location':location})
 
         You can update whatever you want if you have a stub.
-        >>> v.update({'location':other_location, 'token':'stub-uuid'})
+        >>> v.modify({'location':other_location, 'token':'stub-uuid'})
         >>> v.subregion
         u'Similkameen Valley'
 
         Once a token has touched something it can still be changed.
-        >>> v.update({'completely_new_field':'hurfdorf'})
+        >>> v.modify({'completely_new_field':'hurfdorf'})
 
         """
 
@@ -292,6 +292,60 @@ class Winery(BaseModel):
             self.verified_by = "Winery"
             return True
         return False
+
+    def update(self, wines=[]):
+        """
+        Recalculate this object's rank, 
+        and
+        create a search index for it. 
+        """
+        if not self.key:
+            raise ArgumentException("Can't update without a key.")
+
+        index = search.Index(name="wineries")
+        
+        searchkey = str(self.key.id())
+        self.rank = self.calculate_rank(wines)
+        
+        location = ""
+        if self.has_location:
+            location = self.to_dict()['location']
+        elif self.has_location_fuzzy:
+            location = self.to_dict()['location_fuzzy']
+
+        fields = []
+
+        name = self.to_dict()['name']
+        fields.append(search.TextField(name='name', value=name))
+        fields.append(search.TextField(name='location', value=location))
+        
+        if self.has_country:
+            country = self.to_dict()['country']
+            fields.append(search.AtomField(name='country', value=country))
+
+        if self.has_region:
+            region = self.to_dict()['region']
+            fields.append(search.AtomField(name='region', value=region))
+
+        if self.has_subregion:
+            region = self.to_dict()['subregion']
+            fields.append(search.AtomField(name='subregion', value=subregion))
+
+        fields.append(search.AtomField(name='verified', 
+                                       value=str(self.has_verified)))
+
+        fields.append(search.NumberField(name='rank', 
+                                         value=self.rank))
+        
+        fields.append(search.TextField(name='key', 
+                                       value=str(self.key)))
+
+        searchdoc = search.Document(doc_id = searchkey,
+                                    fields=fields,
+                                    rank=self.rank) 
+        
+        index.put(searchdoc)
+        return None
 
     def calculate_rank(self, wines=[]):
         """

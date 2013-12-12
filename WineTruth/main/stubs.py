@@ -8,6 +8,7 @@ currently mocked:
 ndb
 webapp2
 uuid
+search
 
 >>> ndb.Model(variable='awesome', thing='thang')
 <stubs.Model object at ...>
@@ -196,3 +197,16 @@ else:
         @staticmethod
         def uuid4(*args, **kwargs):
             return uuid.UUID()
+
+if google_is_here:
+    from google.appengine.api import search
+else:
+    class search:
+        class Document(object):
+            def __init__(self, *args, **kwargs):
+                pass
+        class Index(object):
+            def __init__(self, *args, **kwargs):
+                pass
+        class Error(Exception):
+            pass
