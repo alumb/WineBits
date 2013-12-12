@@ -44,8 +44,11 @@ def main():
     else: 
         print "Data file not found: Generating random wine."
         winery_url = create_random_winery(connection)
+        add_json_property(connection, winery_url)
         for i in range(0,4):
-            create_random_wine(connection, winery_url)
+            url = create_random_wine(connection, winery_url)
+            add_json_property(connection, url)
+
 
 def create_random_winery(connection):
     location = "San Randomino, The Magical Country Where Test Data Lives"
@@ -66,8 +69,13 @@ def create_random_wine(connection, winery_url):
         'winetype':winetype, 
         'varietal':varietal.encode("ascii", "ignore")
     }
-    return post_wine(connection, winery_url, post)
+    return post_wine(connection, winery_url, post)['url']
 
+
+def add_json_property(connection, wine_url):
+    """ Add a random JSON property to the wine or winery at URL. """
+    prop = { random_name.noun(): random_name.adjective() }
+    return post(connection, wine_url, prop)
 
 def create_winery(connection, name, location):
     """
