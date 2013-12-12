@@ -66,6 +66,9 @@ region_map = {
             u"Toronto"]],
         [u"Quebec", [
             u"Eastern Townships"]]
+    ], 
+    u"San Randomino, The Magical Country Where Test Data Lives":[
+        "Inchoatius"
     ]
 }
 

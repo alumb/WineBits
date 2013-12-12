@@ -2,6 +2,10 @@ import httplib
 import urllib
 import json
 
+import random_name
+import random
+import wine_types
+
 
 def main():
     import sys
@@ -19,31 +23,62 @@ def main():
     connection = httplib.HTTPConnection(host)
 
     print "With data file: ", datafile
-    json_data = json.loads(open(datafile).read())
+    try:
+        json_data = json.loads(open(datafile).read())
+    except IOError:
+        json_data = None
 
-    for key, value in json_data.iteritems():
-        location = key
-        print location
-        for k, v in value.iteritems():
-            winery = k
-            print "\t", winery
-            winery_url = create_winery(connection, winery, location)
-            for wine in v:
-                post_wine(connection, winery_url, wine) 
-                for winekey, winevalue in wine.iteritems():
-                    print "\t\t", winekey, ":", winevalue
-                print "\t\t-------------"
-    winery = {'name': 'Sample Winery', 
-              'location': 'Canada - British Columbia: Okanagan Valley'}
+    if json_data:
+        for key, value in json_data.iteritems():
+            location = key
+            print location
+            for k, v in value.iteritems():
+                winery = k
+                print "\t", winery
+                winery_url = create_winery(connection, winery, location)
+                for wine in v:
+                    post_wine(connection, winery_url, wine) 
+                    for winekey, winevalue in wine.iteritems():
+                        print "\t\t", winekey, ":", winevalue
+                    print "\t\t-------------"
+    else: 
+        print "Data file not found: Generating random wine."
+        winery_url = create_random_winery(connection)
+        for i in range(0,4):
+            create_random_wine(connection, winery_url)
 
-    #print post_winery(connection, winery)
+def create_random_winery(connection):
+    location = "San Randomino, The Magical Country Where Test Data Lives"
+    name = ("Winery " + random_name.adjective().capitalize() + " " 
+            + random_name.noun().capitalize())
+    return create_winery(connection, name, location)
+
+
+def create_random_wine(connection, winery_url):
+    name = (random_name.adjective().capitalize() + " " + 
+            random_name.adjective().capitalize())
+    year = random_name.year()
+    winetype = random.choice(wine_types.types)
+    varietal = random.choice(wine_types.varietals)
+    post = {
+        'name':name, 
+        'year':year,
+        'winetype':winetype, 
+        'varietal':varietal
+    }
+    return post_wine(connection, winery_url, post)
+
 
 def create_winery(connection, name, location):
+    """
+    returns winery URL
+    """
     post_data = {
         'name':name, 
         'location':location
     }
     return post_winery(connection, post_data)['url']
+
 
 def post_winery(connection, post_this={}):
     return post(connection, "/winery", post_this)
