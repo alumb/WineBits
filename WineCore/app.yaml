@@ -15,6 +15,19 @@ handlers:
 #- url: .*
 #  script: main.app
 
+skip_files:
+- ^WineCellar/PineSocks/.sencha/*
+- ^WineCellar/PineSocks/app/*
+- ^WineCellar/PineSocks/ext/*
+- ^WineCellar/PineSocks/overrides/*
+- ^WineCellar/PineSocks/packages/*
+- ^WineCellar/PineSocks/sass/*
+- ^WineCellar/PineSocks/server/static/temp/*
+- ^WineTruth/chef/*
+- ^WineTruth/Vagrantfile
+
+
+
 libraries:
 - name: webapp2
   version: "2.5.2"
