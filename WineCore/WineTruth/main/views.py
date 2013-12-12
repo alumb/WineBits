@@ -1,6 +1,7 @@
 from models.base import YouNeedATokenForThat
 from models.winery import Winery
 from models.wine import Wine
+from models.event import Event
 import regions
 import wine_types
 
@@ -172,7 +173,6 @@ class WineryBaseHandler(MyHandler):
         /winery?location_fuzzy="Somewhere"
         """
         #TODO: Compound Queries
-        #TODO: convert location query into country/region/subregion query
         get = self.request.GET
         if 'subregion' in get:
             self.json_response(Winery.subregion_query(get['subregion']))
@@ -222,7 +222,8 @@ class WineryBaseHandler(MyHandler):
         winery = Winery()
         try:
             key = winery.create(post)
-            winery.update(post)
+            winery.update()
+            Event.create(self.request.remote_addr, "Winery", key)
         except ValueError as e:
             self.response.status = "400 Bad Request"
             self.response.write(str(e))
@@ -285,7 +286,9 @@ class WineryHandler(MyHandler):
 
         try:
             winery.modify(post)
-            winery.update(post)
+            wines = Wine.winery_query(winery)
+            winery.update(wines)
+            Event.update(self.request.remote_addr, "Winery", winery_key)
         except YouNeedATokenForThat as e:
             self.response.write(str(e))
             self.response.status = "401 Unauthorized"
@@ -327,6 +330,7 @@ class WineryWineBaseHandler(MyHandler):
         try:
             key = wine.create( post, winery )
             wine.update(winery)
+            Event.create(self.request.remote_addr, "Wine", key)
         except ValueError as e:
             self.response.status = "400 Bad Request"
             self.response.write(str(e))
@@ -362,6 +366,7 @@ class WineryWineHandler(MyHandler):
         try:
             wine.modify(post, winery)
             wine.update(winery)
+            Event.update(self.request.remote_addr, "Wine", wine_key)
 
         except YouNeedATokenForThat as e:
             self.response.write(str(e))

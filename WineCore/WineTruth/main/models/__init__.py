@@ -1,2 +1,2 @@
 
-__all__ = ["base", "wine", "winery"]
+__all__ = ["base", "wine", "winery", "event"]
