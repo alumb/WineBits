@@ -10,10 +10,10 @@ handlers:
   upload: favicon\.ico
 
 - url: /WineCellar
-  static_dir: static/production/WineCellar
+  static_dir: WineCellar/PineSocks/server/static/production/WineCellar
 
-- url: .*
-  script: main.app
+#- url: .*
+#  script: main.app
 
 libraries:
 - name: webapp2
