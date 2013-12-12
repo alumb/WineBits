@@ -358,8 +358,10 @@ class Wine(BaseModel):
         fields.append(search.AtomField(name='verified', 
                                        value=str(self.has_verified)))
         
-        fields.append(search.TextField(name='key', 
-                                       value=str(self.key)))
+        fields.append(search.TextField(name='id', 
+                                       value=str(self.key.id())))
+        fields.append(search.TextField(name='winery_id',
+                                       value=str(winery.key.id())))
         
         fields.append(search.NumberField(name='rank', 
                                          value=rank))

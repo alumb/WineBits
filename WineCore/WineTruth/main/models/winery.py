@@ -344,8 +344,8 @@ class Winery(BaseModel):
         fields.append(search.NumberField(name='rank', 
                                          value=self.rank))
         
-        fields.append(search.TextField(name='key', 
-                                       value=str(self.key)))
+        fields.append(search.TextField(name='id', 
+                                       value=str(self.key.id())))
 
         searchdoc = search.Document(doc_id = searchkey,
                                     fields=fields,
