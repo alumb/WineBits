@@ -208,5 +208,17 @@ else:
         class Index(object):
             def __init__(self, *args, **kwargs):
                 pass
+            def put(self, *args, **kwargs):
+                pass
         class Error(Exception):
-            pass
+            def __init__(self, *args, **kwargs):
+                pass
+        class TextField(object):
+            def __init__(self, *args, **kwargs):
+                pass
+        class NumberField(object):
+            def __init__(self, *args, **kwargs):
+                pass
+        class AtomField(object):
+            def __init__(self, *args, **kwargs):
+                pass

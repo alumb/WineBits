@@ -14,7 +14,38 @@ class BaseModel(ndb.Model):
                 and dict_[key] != {})
 
     @staticmethod
+    def partial_search_string(string):
+        """
+        In order for GAE Search to do a partial text search on a string, 
+        you need to store it as a text document containing each possible
+        partial text combo: 
+
+        >>> BaseModel.partial_search_string("hello")
+        'h he hel hell hello'
+
+        >>> BaseModel.partial_search_string("hello world")
+        'h he hel hell hello w wo wor worl world'
+
+        This clearly implies left-only partial text - i.e.
+        "hell" will find "hello world" but "orl" will not. 
+
+        """
+        chunks = []
+        words = string.split(" ")
+        for word in words:
+            for i in range(1, len(word)+1):
+                chunks.append( word[0:i] )
+        return " ".join(chunks)
+
+    @staticmethod
     def tidy_up_the_post_object(post):
+        """
+        Before the POST dict can be used, we want to remove any 
+            fields that might conflict with names we're using. 
+        If the POST object has a 'json' key, anything underneath that
+            key is extracted and moved to the base object. 
+        If a key's value is a JSON string, it's parsed (if possible). 
+        """
         post = BaseModel._add_json_fields_to_the_post_object(post)
         post = BaseModel._remove_reserved_fields_from_the_post_object(post)
         new_post = {}

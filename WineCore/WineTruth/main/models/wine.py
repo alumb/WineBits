@@ -329,7 +329,16 @@ class Wine(BaseModel):
         
         if self.has_name:
             name = self.to_dict()['name']
+            partial_name = BaseModel.partial_search_string(name)
             fields.append(search.TextField(name='name', value=name))
+            fields.append(search.TextField(name='partial_name', 
+                                           value=partial_name))
+
+        winery_name = winery.to_dict()['name']
+        partial_winery_name = BaseModel.partial_search_string(winery_name)
+        fields.append(search.TextField(name='winery', value=winery_name))
+        fields.append(search.TextField(name='partial_winery', 
+                                       value=partial_winery_name))
         
         if self.has_winetype:
             winetype = self.to_dict()['winetype']
@@ -337,7 +346,10 @@ class Wine(BaseModel):
         
         if self.has_varietal:
             varietal = self.to_dict()['varietal']
-            fields.append(search.AtomField(name='varietal', value=varietal))
+            partial_varietal = BaseModel.partial_search_string(varietal)
+            fields.append(search.TextField(name='varietal', value=varietal))
+            fields.append(search.TextField(name='partial_varietal', 
+                                           value=partial_varietal))
         
         if self.has_upc:
             upc = self.to_dict()['upc']
@@ -348,6 +360,9 @@ class Wine(BaseModel):
         
         fields.append(search.TextField(name='key', 
                                        value=str(self.key)))
+        
+        fields.append(search.NumberField(name='rank', 
+                                         value=rank))
         
         searchdoc = search.Document(doc_id = searchkey, 
                                     fields=fields, 

@@ -312,12 +312,19 @@ class Winery(BaseModel):
             location = self.to_dict()['location']
         elif self.has_location_fuzzy:
             location = self.to_dict()['location_fuzzy']
+        partial_location = BaseModel.partial_search_string(location)
 
         fields = []
 
         name = self.to_dict()['name']
+        partial_name = BaseModel.partial_search_string(name)
         fields.append(search.TextField(name='name', value=name))
+        fields.append(search.TextField(name='partial_name', 
+                                       value=partial_name))
+
         fields.append(search.TextField(name='location', value=location))
+        fields.append(search.TextField(name='partial_location', 
+                                       value=partial_location))
         
         if self.has_country:
             country = self.to_dict()['country']
