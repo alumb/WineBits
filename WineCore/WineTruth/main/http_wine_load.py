@@ -56,7 +56,7 @@ def create_random_winery(connection):
 
 def create_random_wine(connection, winery_url):
     name = (random_name.adjective().capitalize() + " " + 
-            random_name.adjective().capitalize())
+            random_name.noun().capitalize())
     year = random_name.year()
     winetype = random.choice(wine_types.types)
     varietal = random.choice(wine_types.varietals)
