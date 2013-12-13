@@ -9,8 +9,10 @@ types = [
     u"Dessert Wine",
     u"Sparkling Red",
     u"Sparkling White",
+    u"Sparkling Rose",
     u"Fortified Red",
-    u"Fortified White"]
+    u"Fortified White",
+    u"Fortified Rose"]
 
 fruits = [
     u'Apple',
