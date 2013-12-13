@@ -335,7 +335,7 @@ class Winery(BaseModel):
             fields.append(search.AtomField(name='region', value=region))
 
         if self.has_subregion:
-            region = self.to_dict()['subregion']
+            subregion = self.to_dict()['subregion']
             fields.append(search.AtomField(name='subregion', value=subregion))
 
         fields.append(search.AtomField(name='verified', 
