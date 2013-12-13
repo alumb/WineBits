@@ -187,7 +187,7 @@ a winery. This is intentional.
 Unlike in Winery, 'name' is not required for a wine. However, some combination
 of winetype and ( year, varietal, or name ) is required.
 
-##### winetype ##### 
+##### winetype #####
 
 Winetype is _mandatory_, and must be one of the winetypes provided by 
 `/truth/winetype` - at the moment one of _Red_, _White_, _Rose_, _Blend_,
