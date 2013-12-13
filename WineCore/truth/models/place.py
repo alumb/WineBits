@@ -1,4 +1,4 @@
-from stubs import ndb
+from truth.stubs import ndb
 
 class Place(ndb.Model):
     # Parent: Winery

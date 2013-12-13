@@ -1,3 +1,6 @@
 /WineCore/WineCellar/PineSocks/ext
 /WineCore/WineCellar/PineSocks/server/static/temp
 /WineCore/WineCellar/PineSocks/server/static/production
+*.pyc
+*.idea
+*.vagrant

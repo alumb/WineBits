@@ -1,5 +1,5 @@
-from models.base import BaseModel
-from stubs import ndb, uuid, search
+from truth.models.base import BaseModel
+from truth.stubs import ndb, uuid, search
 
 actions = ["CREATE", "UPDATE"]
 models = ["Winery", "Wine"]

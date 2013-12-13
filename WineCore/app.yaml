@@ -2,7 +2,11 @@ application: winebits
 version: 1
 runtime: python27
 api_version: 1
-threadsafe: yes
+threadsafe: true
+
+env_variables:
+  DEBUG: True
+  GOOGLE: True
 
 handlers:
 - url: /favicon\.ico
@@ -11,6 +15,9 @@ handlers:
 
 - url: /WineCellar
   static_dir: WineCellar/PineSocks/server/static/production/WineCellar
+
+- url: /truth/.* 
+  script: truth.main.application
 
 #- url: .*
 #  script: main.app

@@ -1,9 +1,9 @@
 import copy
 
-import regions
-from models.base import BaseModel, YouNeedATokenForThat
-from stubs import ndb, uuid, search
-from constants import MAX_RESULTS
+from truth import regions
+from truth.models.base import BaseModel, YouNeedATokenForThat
+from truth.stubs import ndb, uuid, search
+from truth.constants import MAX_RESULTS
 
 class Winery(BaseModel):
     """

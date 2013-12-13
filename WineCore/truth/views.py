@@ -1,14 +1,13 @@
-from models.base import YouNeedATokenForThat
-from models.winery import Winery
-from models.wine import Wine
-from models.event import Event
-import regions
-import wine_types
+from truth.models.base import YouNeedATokenForThat
+from truth.models.winery import Winery
+from truth.models.wine import Wine
+from truth.models.event import Event
+from truth.stubs import webapp2, ndb, debug, search
+from truth import regions, wine_types
 
 import os
 import json
 
-from stubs import webapp2, ndb, debug, search
 
 def get_url(model):
     """

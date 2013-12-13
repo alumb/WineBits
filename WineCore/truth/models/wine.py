@@ -1,8 +1,8 @@
-import wine_types
-from models.base import BaseModel, YouNeedATokenForThat
-from models.winery import Winery
-from constants import MAX_RESULTS
-from stubs import ndb, search
+from truth import wine_types
+from truth.models.base import BaseModel, YouNeedATokenForThat
+from truth.models.winery import Winery
+from truth.constants import MAX_RESULTS
+from truth.stubs import ndb, search
 
 class Wine(BaseModel):
     # Parent: Winery

@@ -1,11 +1,12 @@
 import httplib
 import urllib
 import json
+import random
 
 import random_name
-import random
 import wine_types
 
+prelude = "/truth"
 
 def main():
     import sys
@@ -97,6 +98,7 @@ def post_wine(connection, winery_url, post_this={}):
 
 
 def post(connection, url, params={}):
+    url = prelude+url
     print "POST: ", url 
     params = urllib.urlencode(params)
     connection.request("POST", url, params)
