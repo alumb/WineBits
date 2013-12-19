@@ -1,3 +1,7 @@
 handlers:
-- url: /cellar
-  static_dir: cellar/PineSocks/server/static/production/WineCellar
+- url: /cellar/
+  static_files: cellar/PineSocks/server/static/production/WineCellar/index.html
+  upload: cellar/PineSocks/server/static/production/WineCellar/index.html
+
+- url: /cellar/
+  static_dir: cellar/PineSocks/server/static/production/WineCellar/
