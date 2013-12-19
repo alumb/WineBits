@@ -19,7 +19,7 @@ file "/home/vagrant/.bash_profile" do
 end
 
 execute "install packages" do
-    cwd "/home/vagrant/synced/main/"
-    command "pip install -r deps" 
+    cwd "/home/vagrant/synced/truth/"
+    command "make install" 
 end
 
