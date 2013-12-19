@@ -1,0 +1,3 @@
+handlers:
+- url: /WineCellar
+  static_dir: WineCellar/PineSocks/server/static/production/WineCellar

@@ -8,13 +8,13 @@ env_variables:
   DEBUG: True
   GOOGLE: True
 
+includes:
+- WineCellar/PineSocks/WineCellar.yaml
+
 handlers:
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
-
-- url: /WineCellar
-  static_dir: WineCellar/PineSocks/server/static/production/WineCellar
 
 - url: /truth/.* 
   script: truth.main.application
