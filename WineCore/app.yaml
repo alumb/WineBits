@@ -19,6 +19,9 @@ handlers:
 - url: /truth/.* 
   script: truth.main.application
 
+- url: /style
+  static_dir: style
+
 #- url: .*
 #  script: main.app
 
