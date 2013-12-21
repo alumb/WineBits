@@ -92,9 +92,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.add_recipe "gae" 
     chef.add_recipe "heroic"
     #chef.add_recipe "mongodb::default" 
-    # chef.json = {
+    chef.add_recipe "java" 
+    chef.add_recipe "SenchaCmd" 
+    #chef.json = {
     #  :java => {
-    #    :install_flavor => 'oracle',
+    #    :install_flavor => 'openjdk',
     #    :jdk_version => 7,
     #    :oracle => {
     #      "accept_oracle_download_terms" => true
