@@ -19,4 +19,10 @@ end
 execute "install SenchaCmd" do
     cwd "/home/vagrant/"
     command "./SenchaCmd-4.0.1.45-linux.run --mode unattended --prefix /home/vagrant" 
+    not_if { ::File.directory?("/home/vagrant/Sencha")}
+end
+
+execute "fixup /home/vagrant/Sencha permissions" do
+  command "chown -Rf vagrant.vagrant /home/vagrant/Sencha"
+  only_if { Etc.getpwuid(File.stat('/home/vagrant/Sencha').uid).name != "vagrant" }
 end
