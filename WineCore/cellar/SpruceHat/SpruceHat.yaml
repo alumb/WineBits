@@ -1,0 +1,5 @@
+handlers:
+- url: /cellar/server/.* 
+  script: cellar.SpruceHat.main.application
+  login: required
+  auth_fail_action: redirect 
