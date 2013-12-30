@@ -6,8 +6,8 @@ Ext.define('WineCellar.model.Wine', {
         {name:'varietal', type:'string'},
         {name:'winetype', type:'string'},
         {name:'year', type:'int'},
-        {name:'alcohol', type:'float'},
-        {name:'upc', type:'string'}
+        {name:'upc', type:'string'},
+        {name:'verified', type:'boolean'}
     ]
 });
 

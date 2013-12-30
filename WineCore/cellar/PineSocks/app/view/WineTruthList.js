@@ -19,14 +19,8 @@ Ext.define("WineCellar.view.WineTruthList", {
                 hideTrigger:false
             }
         },
-        {text:"Alcohol", dataIndex:'alcohol', editor: {
-                xtype:'numberfield',
-                allowDecimals: true,
-                decimalPrecision: 1,
-                step: 0.1
-            }
-        },
         {text:"UPC", dataIndex:'upc',width:150, editor: 'numberfield'},
+        {text:"Verified", dataIndex:'verified', editor:'checkboxfield'},
         {xtype:"actioncolumn",width:30, items:[{
             icon:"ext/examples/restful/images/delete.png",
             tooltip:"Delete",

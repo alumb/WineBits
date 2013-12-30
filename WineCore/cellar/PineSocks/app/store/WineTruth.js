@@ -13,6 +13,15 @@ Ext.define('WineCellar.store.WineTruth', {
           root: 'wines'
       }
   },
+  /*proxy: {
+      type: 'rest',
+      url:"../truth/search",
+      reader: {
+          type: 'json',
+          root: 'wines'
+      },
+      noCache:true
+  },*/
  listeners:{
     "load":function() {
       
