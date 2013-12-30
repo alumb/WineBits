@@ -4,13 +4,17 @@ Ext.define('WineCellar.view.Main', {
     requires:[
         'Ext.tab.Panel',
         'Ext.layout.container.Border',
-        'WineCellar.view.WineTruthList'
+        'WineCellar.view.WineTruthList',
+        'WineCellar.view.Inventory'
     ],
     
     layout:"fit",
-
+    activeTab:1,
     items:[{
         xtype:'WineTruthList',
         title: 'Wine Truth List'
+    },{
+        xtype:'Inventory',
+        title: 'Inventory'
     }]
 });

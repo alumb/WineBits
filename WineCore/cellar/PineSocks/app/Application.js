@@ -8,7 +8,8 @@ Ext.define('WineCellar.Application', {
     ],
 
     controllers: [
-        "WineTruth"
+        "WineTruth",
+        "WineInventory"
     ],
 
     stores: [
