@@ -9,7 +9,7 @@ Ext.define("WineCellar.view.Inventory", {
     ],
     store:"WineInventory",
     columns: [
-        {xtype:"associationcolumn", text:"Winery", dataIndex:'Wine.winery', flex:1, editor: 'textfield'},
+        {xtype:"associationcolumn", text:"Winery", dataIndex:'Wine.Winery.name', flex:1, editor: 'textfield'},
         {xtype:"associationcolumn", text:"Name", dataIndex:'Wine.name', flex:1, editor: 'textfield'},
         {xtype:"associationcolumn", text:"Varietal", dataIndex:'Wine.varietal', flex:1, editor: 'textfield'},
         {xtype:"associationcolumn", text:"Wine Type", dataIndex:'Wine.winetype', editor: 'textfield'},

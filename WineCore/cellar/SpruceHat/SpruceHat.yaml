@@ -1,4 +1,7 @@
 handlers:
+- url: /cellar/server/static/
+  static_dir: cellar/PineSocks/server/static
+
 - url: /cellar/server/.* 
   script: cellar.SpruceHat.main.application
   login: required
