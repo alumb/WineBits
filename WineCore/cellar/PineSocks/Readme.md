@@ -32,3 +32,7 @@ included in the application's javascript code build.  By default, files in this
 folder are mapped to the application's root namespace, 'WineCellar'. The
 namespace to which files in this directory are matched is controlled by the
 app.sass.namespace property in WineCellar/.sencha/app/sencha.cfg. 
+
+# resources
+
+Icons provided by Mark James - http://www.famfamfam.com/lab/icons/silk/

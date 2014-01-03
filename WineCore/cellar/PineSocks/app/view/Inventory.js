@@ -39,7 +39,7 @@ Ext.define("WineCellar.view.Inventory", {
             }
         },
         {xtype:"actioncolumn",width:30, items:[{
-            icon:"ext/examples/restful/images/edit.png",
+            icon:"resources/silk/icons/pencil.png",
             tooltip:"Edit",
             handler:function(grid,rowIndex,colIndex) {
                 debugger;
