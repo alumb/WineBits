@@ -1,10 +1,11 @@
 Ext.define('WineCellar.model.Winery', {
-    extend: 'Ext.data.Model',
-    fields: [
-        {name:'name', type:'string'},
-        {name:'location', type:'string'},
-        {name:'country', type:'string'},
-        {name:'region', type:'string'},
-        {name:'subregion', type:'string'}
-    ]
+	extend: 'Ext.data.Model',
+	fields: [
+		{name:'name', type:'string'},
+		{name:'location', type:'string'},
+		{name:'verified', type:'string'},
+		{name:'id', type:'string'},
+		{name:'url', type:'string'},
+		{name:'key', type:'string'},
+	]
 });
