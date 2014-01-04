@@ -1,15 +1,15 @@
 Ext.define('WineCellar.view.Viewport', {
-    extend: 'Ext.container.Viewport',
-    requires:[
-        'Ext.layout.container.Fit',
-        'WineCellar.view.Main'
-    ],
+	extend: 'Ext.container.Viewport',
+	requires:[
+		'Ext.layout.container.Fit',
+		'WineCellar.view.Main'
+	],
 
-    layout: {
-        type: 'fit'
-    },
+	layout: {
+		type: 'fit'
+	},
 
-    items: [{
-        xtype: 'app-main'
-    }]
+	items: [{
+		xtype: 'app-main'
+	}]
 });
