@@ -187,6 +187,7 @@ class WineryBaseHandler(MyHandler):
 
     def get(self):
         """
+        /winery?
         /winery?country=Canada
         /winery?region=British Columbia
         /winery?subregion=Okanagan Valley
@@ -225,7 +226,9 @@ class WineryBaseHandler(MyHandler):
                 verified = True
             self.json_response(Winery.verified_query(verified))
             return
-        self.response.write("Winery List Interface Goes Here")
+
+        #if no params, return entire list.
+        self.json_response(Winery.all_query())
 
     def post(self):
         """

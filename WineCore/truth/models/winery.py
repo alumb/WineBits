@@ -435,6 +435,13 @@ class Winery(BaseModel):
 
 
     @staticmethod
+    def all_query():
+        qry = Winery.query()
+        results = qry.fetch(MAX_RESULTS, projection=[Winery.name,
+                                            Winery.verified, Winery.location])
+        return [x for x in results]
+
+    @staticmethod
     def country_query(country):
         qry = Winery.query(Winery.country == country)
         results = qry.fetch(MAX_RESULTS, projection=[Winery.name,
