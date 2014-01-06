@@ -6,7 +6,6 @@ Ext.define('WineCellar.store.Wines', {
 	autoLoad:false,
 	proxy: {
 		type: 'ajax',
-		url:"../truth/winery/4782875580825600/wine",
 		reader: {
 			type: 'json',
 			root: '/'

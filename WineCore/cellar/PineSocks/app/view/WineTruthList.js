@@ -5,7 +5,6 @@ Ext.define("WineCellar.view.WineTruthList", {
 		"Ext.grid.Panel",
 		"Ext.grid.column.Action",
 		"Ext.form.field.Number",
-		"Ext.grid.plugin.RowEditing"
 	],
 	layout:{
 		type:'vbox',
@@ -24,25 +23,7 @@ Ext.define("WineCellar.view.WineTruthList", {
 		store:"Wineries",
 		columns: [
 			{text:"Name", dataIndex:'name', flex:1, editor: 'textfield'},
-			{text:"location", dataIndex:'location', flex:1, editor: 'textfield'},
-			{xtype:"actioncolumn",width:30, items:[{
-				icon:"ext/examples/restful/images/delete.png",
-				tooltip:"Delete",
-				handler:function(grid,rowIndex,colIndex) {
-					grid.getStore().removeAt(rowIndex);
-				}
-			}]}
-		],
-		tbar: [{
-			text: 'Add Winery',
-			handler: function() { this.up("WineTruthList").onAddClick(); }
-		}],
-		plugins: [
-			{   
-				ptype:"rowediting",
-				pluginId:"rowEditing",
-				clicksToEdit: 2
-			}
+			{text:"location", dataIndex:'location', flex:1, editor: 'textfield'}
 		],
 		listeners:{
 			'itemclick':function(grid, record, item, index, e, eOpts) {
@@ -52,15 +33,6 @@ Ext.define("WineCellar.view.WineTruthList", {
 					url:"../truth/winery/" + id + "/wine"
 				})
 			}
-		},
-		onAddClick: function(){
-			// Create a model instance
-			var rec = Ext.create("WineCellar.model.Wine",{
-				"winery":"new"
-			});
-			
-			this.getStore().insert(0, rec);
-			this.getPlugin("rowEditing").startEdit(rec,0);
 		}
 	},{
 		xtype:"grid",
@@ -79,35 +51,8 @@ Ext.define("WineCellar.view.WineTruthList", {
 				}
 			},
 			{text:"UPC", dataIndex:'upc',width:150, editor: 'numberfield'},
-			{text:"Verified", dataIndex:'verified', editor:'checkboxfield'},
-			{xtype:"actioncolumn",width:30, items:[{
-				icon:"ext/examples/restful/images/delete.png",
-				tooltip:"Delete",
-				handler:function(grid,rowIndex,colIndex) {
-					grid.getStore().removeAt(rowIndex);
-				}
-			}]}
-		],
-		tbar: [{
-			text: 'Add Wine',
-			handler: function() { this.up("WineTruthList").onAddClick(); }
-		}],
-		plugins: [
-			{   
-				ptype:"rowediting",
-				pluginId:"rowEditing",
-				clicksToEdit: 2
-			}
-		],
-		onAddClick: function(){
-			// Create a model instance
-			var rec = Ext.create("WineCellar.model.Wine",{
-				"winery":"new"
-			});
-			
-			this.getStore().insert(0, rec);
-			this.getPlugin("rowEditing").startEdit(rec,0);
-		}
+			{text:"Verified", dataIndex:'verified', editor:'checkboxfield'}
+		]
 		
 	}]
 });
