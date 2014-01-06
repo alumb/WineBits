@@ -28,8 +28,13 @@ handlers:
 
 skip_files:
 - ^cellar/PineSocks/.sencha/*
-- ^cellar/PineSocks/app/*
-- ^cellar/PineSocks/ext/*
+#- ^cellar/PineSocks/app/*
+#- ^cellar/PineSocks/ext/*
+- ^cellar/PineSocks/ext/.sencha/*
+- ^cellar/PineSocks/ext/builds/*
+- ^cellar/PineSocks/ext/docs/*
+- ^cellar/PineSocks/ext/examples/*
+- ^cellar/PineSocks/ext/welcome/*
 - ^cellar/PineSocks/overrides/*
 - ^cellar/PineSocks/packages/*
 - ^cellar/PineSocks/sass/*
