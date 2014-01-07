@@ -14,20 +14,20 @@ class WineBottle(BaseModel):
     def create(self, data):
         name = None
         if 'yearBought' in data:
-            yearBought = data['yearBought']
+            yearBought = int(data['yearBought'])
             self.yearBought = yearBought
             del data['yearBought']
 
 
         name = None
         if 'drinkBefor' in data:
-            drinkBefor = data['drinkBefor']
+            drinkBefor = int(data['drinkBefor'])
             self.drinkBefor = drinkBefor
             del data['drinkBefor']
 
 
         name = None
-        if 'drunkOn' in data:
+        if 'drunkOn' in data and data['drunkOn'] != '':
             drunkOn = data['drunkOn']
             self.drunkOn = drunkOn
             del data['drunkOn']

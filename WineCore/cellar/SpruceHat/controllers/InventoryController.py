@@ -16,11 +16,11 @@ class InventoryHandler(webapp2.RequestHandler):
 
         JsonView.json_response(self, [x.to_JSON() for x in results])
 
-    def put(self):
+    def post(self):
 
         user = users.get_current_user()
 
-        post = json.loads(self.request.body)[0]
+        post = self.request.POST
 
         if 'wine_id' in post and 'winery_id' in post:
 
@@ -42,7 +42,7 @@ class InventoryHandler(webapp2.RequestHandler):
             JsonView.json_response(self, jsondict)
 
         else:
-            JsonView.json_response(self, {"error":"there was no wine_id"})
+            JsonView.json_response(self, {"error":"there was no wine_id","post":self.request.body})
 
     def delete(self):
         # post = json.loads(self.request.body)[0]

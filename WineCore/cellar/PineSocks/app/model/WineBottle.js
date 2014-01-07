@@ -1,5 +1,8 @@
 Ext.define('WineCellar.model.WineBottle', {
 	extend: 'Ext.data.Model',
+	requires:[
+		'WineCellar.store.writer.Rest'
+	],
 	fields: [
 		{name:'yearBought', type:'int'},
 		{name:'drinkBefor', type:'int'},
@@ -16,15 +19,14 @@ Ext.define('WineCellar.model.WineBottle', {
 	}],
 	proxy: {
 		type: 'rest',
-		url:"server/inventory/",
+		url:"server/inventory",
 		noCache:false,
 		reader: {
 			type: 'json',
 			root: 'wineBottles'
 		},
 		writer: {
-			type: 'json',
-			allowSingle:false,
+			type: 'rest',
 			getRecordData: function(record, operation) {
 				var data = Ext.data.writer.Json.prototype.getRecordData.apply(this,[record, operation]);
 				data.wine_id = record.getWine().get("id");

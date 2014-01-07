@@ -40,8 +40,11 @@ Ext.define('WineCellar.controller.WineInventory', {
 						var wine = Ext.getStore("Wines").findRecord("id",values.wine);
 						wineBottle.setWine(wine);
 
-						Ext.getStore("WineInventory").add(wineBottle);
-						Ext.getStore("WineInventory").sync();
+						wineBottle.save();
+
+						Ext.defer(function() {
+							Ext.getStore("WineInventory").reload();
+						}, 1000);
 					//}
 
 				}
