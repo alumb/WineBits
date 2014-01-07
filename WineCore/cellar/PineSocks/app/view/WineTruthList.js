@@ -30,7 +30,9 @@ Ext.define("WineCellar.view.WineTruthList", {
 				var id = record.get("id");
 				var store = Ext.getStore("Wines");
 				store.load({
-					url:"../truth/winery/" + id + "/wine"
+					params:{
+						q:"winery_id:" + id
+					}
 				})
 			}
 		}

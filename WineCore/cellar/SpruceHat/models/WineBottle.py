@@ -38,6 +38,9 @@ class WineBottle(BaseModel):
         key = self.put();
         return key
 
+    def delete(self):
+        self.key.delete()
+
     def to_JSON(self):
         jsondict = self.to_dict()
         jsondict["wine"] = self.key.parent().get().to_dict()

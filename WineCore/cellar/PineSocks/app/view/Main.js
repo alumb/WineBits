@@ -9,7 +9,7 @@ Ext.define('WineCellar.view.Main', {
 	],
 	
 	layout:"fit",
-	activeTab:0,
+	activeTab:1,
 	items:[{
 		xtype:'WineTruthList',
 		title: 'Wine Truth List'

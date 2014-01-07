@@ -38,11 +38,18 @@ Ext.define("WineCellar.view.InventoryList", {
 				xtype:'datefield'                
 			}
 		},
-		{xtype:"actioncolumn",width:30, items:[{
+		{xtype:"actioncolumn",width:50, items:[{
 			icon:"resources/silk/icons/pencil.png",
 			tooltip:"Edit",
 			handler:function(grid,rowIndex,colIndex) {
 				debugger;
+			}
+		},{
+			icon:"resources/silk/icons/delete.png",
+			tooltip:"Delete",
+			handler:function(grid,rowIndex,colIndex) {
+				grid.getStore().removeAt(rowIndex);
+				grid.getStore().sync()
 			}
 		}]}
 	]
