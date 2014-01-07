@@ -7,5 +7,14 @@ Ext.define('WineCellar.model.Winery', {
 		{name:'id', type:'string'},
 		{name:'url', type:'string'},
 		{name:'key', type:'string'},
-	]
+	],
+	proxy: {
+		type: 'ajax',
+		url:"../truth/search",
+		noCache:false,
+		reader: {
+			type: 'json',
+			root: 'wineries'
+		}
+	}
 });

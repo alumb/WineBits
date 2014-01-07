@@ -3,15 +3,7 @@ Ext.define('WineCellar.store.Wineries', {
 	storeId:"Wineries",
 	require:["WineCellar.model.Winery"],
 	model:"WineCellar.model.Winery",
-	autoLoad:true,
-	proxy: {
-		type: 'ajax',
-		url:"../truth/winery",
-		reader: {
-			type: 'json',
-			root: '/'
-		}
-	}
+	autoLoad:true
 });
 
 

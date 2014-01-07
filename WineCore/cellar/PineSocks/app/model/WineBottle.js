@@ -11,8 +11,17 @@ Ext.define('WineCellar.model.WineBottle', {
 		associationKey:"wine", //this is the name in json
 		model:"WineCellar.model.Wine",
 		name:"wine",
-		getterName:"getWine"
-
-	}]
+		getterName:"getWine",
+		setterName:"setWine"
+	}],
+	proxy: {
+		type: 'rest',
+		url:"server/inventory/",
+		noCache:false,
+		reader: {
+			type: 'json',
+			root: 'wineBottles'
+		}
+	}
 });
 
