@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>WineBits: WineTruth Widgetry</title>
+  <meta name="description" content="Demo stuff that works with WineTruth">
+  <meta name="author" content="WineBits:classam">
+
+  <link rel="stylesheet" href="/style/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="../../style/css/bootstrap.min.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="/style/js/bootstrap.min.js"></script>
+  <script src="../../style/js/bootstrap.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.js"></script>
+  <script src="components.js"></script>
+  <script src="main.js"></script>
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+<body ng-app="main">
+  <div class="container">
+    <wineryselect>
+
+    </wineryselect>
+    <div class='winery-select col-md-12'> 
+        <h2>Winery</h2>
+        <div class='input-group'>
+            <input type="text" placeholder="Winery" name="winery" /> 
+            <input type="text" placeholder="Canada - British Columbia: Okanagan Valley" /> 
+        </div>
+    </div>
+    <div class='wine-select col-md-12'> 
+        <h2>Wine</h2> 
+        <div class='input-group'> 
+            <input type="text" placeholder="2010" name="year"/>
+            <input type="text" placeholder="Sauvignon Blanc" name="varietal" />
+            <input type="text" placeholder="The Judge" name="name" />
+        </div>
+    </div>
+  </div>
+</body>
+</html>
+
+
