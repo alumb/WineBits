@@ -29,20 +29,32 @@ $(function(){
     });
 
     var SearchWineView = Backbone.View.extend({
-        tagName: "li",
+        tagName: "a",
         className: "wine list-group-item",
         template: Handlebars.compile($("#template-wine").html()),
         render: function(){
             this.$el.html(this.template(this.model.toJSON()));
+        },
+        events: {
+            "click": "clicked"
+        },
+        clicked: function(){
+            alert("Wine Description! [Add this wine to my collection]");
         }
     });
 
     var SearchWineryView = Backbone.View.extend({
-        tagName: "li",
+        tagName: "a",
         className: "winery list-group-item",
         template: Handlebars.compile($("#template-winery").html()),
         render: function(){
             this.$el.html(this.template(this.model.toJSON()));
+        },
+        events: {
+            "click": "clicked"
+        },
+        clicked: function(){
+            alert("Winery Description!");
         }
     });
 
