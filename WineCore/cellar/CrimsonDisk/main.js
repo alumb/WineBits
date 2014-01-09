@@ -13,6 +13,10 @@ $(function(){
 
     var SearchWineryResult = Backbone.Model.extend({});
 
+    var WineDetailModel = Backbone.Model.extend({});
+    
+    var WineryDetailModel = Backbone.Model.extend({});
+
     var SearchBarView = Backbone.View.extend({
         template: Handlebars.compile($("#template-search").html()),
         render: function(){
@@ -39,7 +43,7 @@ $(function(){
             "click": "clicked"
         },
         clicked: function(){
-            alert("Wine Description! [Add this wine to my collection]");
+            app.navigate(this.model.get('url'), {trigger:true})
         }
     });
 
@@ -69,12 +73,12 @@ $(function(){
             var searchterm = this.model.get("searchterm");
             var url = TRUTH_LOCATION + "/search?q=" + searchterm;
             var that = this;
-            //this.last_results = this.last_results + 1;
-            //var this_results = this.last_results;
+            this.last_results = this.last_results + 1;
+            var this_results = this.last_results;
             $.getJSON( url, function(data){
-            //    if( ! that.last_results == this_results ){
-            //        return;
-            //    }
+                if( ! that.last_results == this_results ){
+                    return;
+                }
                 that.wine_views = [];
                 that.winery_views = [];
                 _.each(data['wines'], function(wine){
@@ -112,10 +116,11 @@ $(function(){
 
     var SearchView = Backbone.View.extend({
         template: Handlebars.compile($("#template-main").html()),
-        el: $("#wineapp"),
+        el: $("#mainwindow"),
         initialize: function(){
             this.render();
-            searchmodel = new SearchModel;
+            this.searchmodel = new SearchModel;
+            var searchmodel = this.searchmodel;
             var sbv = new SearchBarView({ model: searchmodel });
             sbv.setElement(this.$("#searchbar"));
             sbv.render();
@@ -129,5 +134,86 @@ $(function(){
         }
     });
 
-    var App = new SearchView;
+    var NavView = Backbone.View.extend({
+        template: Handlebars.compile($("#template-nav").html()),
+        el: $("#nav"),
+        initialize: function(){
+            this.render();
+        },
+        render: function(){
+            this.$el.html(this.template({}));
+            return this;
+        },
+        events: {
+            "click .search": "search", 
+            "click .cellar": "cellar"
+        },
+        search: function(){
+            app.navigate("home", {trigger:true});
+        },
+        cellar: function(){
+        }
+    });
+
+    var WineView = Backbone.View.extend({
+        template: Handlebars.compile($("#template-wine-detail").html()), 
+        el: $("#mainwindow"),
+        load_wine: function(winery, wine){
+            var winery_url = TRUTH_LOCATION + "/winery/" + winery
+            var wine_url = TRUTH_LOCATION + "/winery/" + winery + "/wine/" + wine;
+            var that = this;
+            $.getJSON( winery_url, function(data){
+                that.winery_model = new WineryDetailModel(data);
+                that.render();
+            });
+            $.getJSON( wine_url, function(data){
+                that.model = new WineDetailModel(data);
+                that.render();
+            });
+        },
+        render: function(){
+            if( this.winery_model === undefined || 
+                this.model === undefined ){
+                return;
+            }
+            obj = this.model.toJSON();
+            obj['winery'] = this.winery_model.get('name');
+            this.$el.html(this.template(obj));
+        }
+    });
+
+    var MainRouter = Backbone.Router.extend({
+        routes: {
+            "home":                         "home",
+            "search/:query":                "search",
+            "winery/:winery/wine/:wine":    "wine"
+        },
+        initialize: function(){
+            this.Nav = new NavView;
+        },
+        home: function(){
+            this.App = new SearchView;
+            this.listenTo(this.App.searchmodel, 'change', this.update_nav);
+        },
+        search: function(query){
+            this.App = new SearchView;
+            this.App.searchmodel.set("searchterm", query);
+            this.listenTo(this.App.searchmodel, 'change', this.update_nav);
+        },
+        update_nav: function(model){
+            app.navigate("search/"+model.get('searchterm'))
+        },
+        wine: function(winery, wine){
+            this.App = new WineView();
+            this.App.load_wine(winery, wine);
+        },
+
+    });
+
+    var app = new MainRouter;
+    
+    if( !Backbone.history.start() ){
+        app.navigate("home", {trigger:true});
+    }
+
 });
