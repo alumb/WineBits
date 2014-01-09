@@ -1,4 +1,5 @@
-/WineCore/cellar/PineSocks/ext
+/WineCore/cellar/PineSocks/ext/docs
+/WineCore/cellar/PineSocks/ext/examples
 /WineCore/cellar/PineSocks/server/static/temp
 /WineCore/cellar/PineSocks/server/static/production
 *.pyc
