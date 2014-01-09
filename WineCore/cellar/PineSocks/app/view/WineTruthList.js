@@ -4,7 +4,7 @@ Ext.define("WineCellar.view.WineTruthList", {
 	requires:[
 		"Ext.grid.Panel",
 		"Ext.grid.column.Action",
-		"Ext.form.field.Number",
+		"Ext.form.field.Number"
 	],
 	layout:{
 		type:'vbox',

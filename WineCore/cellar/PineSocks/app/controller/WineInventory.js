@@ -24,7 +24,7 @@ Ext.define('WineCellar.controller.WineInventory', {
 					Ext.getCmp("WineTypeCombo").setValue(record[0].get("winetype"));
 					Ext.getCmp("VarietalCombo").setValue(record[0].get("varietal"));
 					Ext.getCmp("YearField").setValue(record[0].get("year"));
-				},
+				}
 			},
 			'WineBottleEdit button[action=add]':{
 				'click':function(button) {

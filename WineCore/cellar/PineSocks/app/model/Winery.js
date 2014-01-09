@@ -6,7 +6,7 @@ Ext.define('WineCellar.model.Winery', {
 		{name:'verified', type:'string'},
 		{name:'id', type:'string'},
 		{name:'url', type:'string'},
-		{name:'key', type:'string'},
+		{name:'key', type:'string'}
 	],
 	proxy: {
 		type: 'ajax',

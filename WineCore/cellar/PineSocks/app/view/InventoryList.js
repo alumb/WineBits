@@ -42,7 +42,7 @@ Ext.define("WineCellar.view.InventoryList", {
 			icon:"resources/silk/icons/pencil.png",
 			tooltip:"Edit",
 			handler:function(grid,rowIndex,colIndex) {
-				debugger;
+				//debugger;
 			}
 		},{
 			icon:"resources/silk/icons/delete.png",
