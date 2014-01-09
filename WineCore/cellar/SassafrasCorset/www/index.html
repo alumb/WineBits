@@ -1,0 +1,112 @@
+
+<!doctype html>
+<html>
+<head>
+<title>jQuery Mobile page</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Default theme -->
+<link rel="stylesheet"
+	href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css">
+
+<!-- Custom theme -->
+<link rel="stylesheet" href="css/themes/winebits.css" />
+<link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
+
+<link rel="stylesheet"
+	href="http://code.jquery.com/mobile/1.4.0/jquery.mobile.structure-1.4.0.min.css" />
+<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script
+	src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
+
+
+<style>
+.custom-count-pos {
+	font-size: 11px;
+	font-weight: bold;
+	padding: 0.2em 0.5em;
+	float: right;
+}
+</style>
+
+
+</head>
+<body>
+	<div id="wine_page" data-role="page">
+
+		<div data-role="header">
+			<h1>Le Vieux Pin - Syrah - 2010</h1>
+		</div>
+		<!-- /header -->
+
+		<div data-role="content">
+
+			<!-- Common Info -->
+			<div style="position: relative;">
+
+				<!-- Wine Photo -->
+				<div style="float: left; width: 33%">
+					<img src="images/test/le_vieux_pin.jpg"
+						style="width: 100%; border: 1px solid black" />
+				</div>
+
+				<!-- Info -->
+				<div style="float: left; width: 67%; height: 100%;">
+					<div style="position: relative; padding: 10px;">
+						<div style="font-size: 2em">Le Vieux Pin</div>
+						<div style="font-size: 1.5em">Syrah</div>
+						<div style="font-size: 0.75em">2010</div>
+					</div>
+				</div>
+
+				<div style="clear: both;"></div>
+
+				<div style="position: absolute; bottom: 0px; right: 0px;">
+					<div>Average Rating: 9.5/10</div>
+					<div style="text-align: right;">4 Ratings</div>
+				</div>
+			</div>
+
+
+			<div data-role="collapsible" data-iconpos="right"
+				data-collapsed="false">
+				<h3>
+					<div class="ui-btn-up-c ui-btn-corner-all custom-count-pos">4</div>
+					Tastings
+				</h3>
+				<p></p>
+			</div>
+
+			<div data-role="collapsible" data-iconpos="right">
+				<h3>
+					<div class="ui-btn-up-c ui-btn-corner-all custom-count-pos">2</div>
+					Related
+				</h3>
+				<p><div>Currently In Cellar</div>
+			</div>
+
+			<div data-role="collapsible" data-iconpos="right">
+				<h3>Details</h3>
+				<p></p>
+			</div>
+
+			<div data-role="collapsible" data-iconpos="right">
+				<h3>Photos</h3>
+				<p></p>
+			</div>
+
+
+		</div>
+		<!-- /content -->
+
+		<!--  
+		<div data-role="footer">
+			<h4>My Footer</h4>
+		</div>-->
+		<!-- /footer -->
+
+	</div>
+	<!-- /page -->
+</body>
+</html>
