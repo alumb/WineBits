@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>WineBits</title>
+  <meta name="description" content="Demo stuff that works with WineTruth">
+  <meta name="author" content="WineBits:classam">
+
+  <link rel="stylesheet" href="/style/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="../../style/css/bootstrap.min.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="/style/js/bootstrap.min.js"></script>
+  <script src="../../style/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.0/backbone-min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js"></script>
+
+  <script src="main.js"></script>
+
+  <script id="template-main" type="text/x-handlebars-template">
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div id="searchbar">
+      </div>
+    </nav>
+    <div style="height:60px"> </div>
+    <ul id="searchresults" class="list-group">
+    </ul>
+  </script>
+
+  <script id="template-search" type="text/x-handlebars-template">
+    <form class="navbar-form navbar-left" role="search">
+      <input id="search" type="text" class="form-control" placeholder="Search" />
+    </form> 
+  </script>
+
+  <script id="template-wine" type="text/x-handlebars-template">
+    <div class='varietal pull-right'>{{varietal}}</div>
+    <div class='pull-right' style='width:10px;'> : </div>
+    <div class='winetype pull-right'>{{winetype}}</div>
+    <div class="glyphicon glyphicon-filter pull-left"></div>
+    <h4> 
+      <span class='winery'>{{winery}}</span>
+      <span class='year'>{{year}}</span>
+      <span class='name'>{{name}}</span>
+    </h4>
+  </script>
+
+  <script id="template-winery" type="text/x-handlebars-template">
+    <h4>{{name}}</h4>
+    <div class='location'>{{location}}</div>
+    
+  </script>
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+  <div id="wineapp" class="container">
+  </div>
+</body>
+</html>
+
+

@@ -20,6 +20,9 @@ handlers:
 - url: /truth/.* 
   script: truth.main.application
 
+- url: /donk
+  static_dir: cellar/CrimsonDisk
+
 - url: /style
   static_dir: style
 

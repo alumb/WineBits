@@ -418,6 +418,7 @@ class SearchHandler(MyHandler):
         
         wine_limiter = search.QueryOptions(
             returned_fields=['year', 'name', 'varietal', 'winery', 'varietal',
+                            'winetype', 
                              'upc', 'verified', 'id', 'winery_id', 'rank']) 
         winery_limiter = search.QueryOptions(
             returned_fields=['name', 'location', 'verified', 'id', 'rank'])
