@@ -169,18 +169,30 @@ $(function(){
             var winery_url = TRUTH_LOCATION + "/winery/" + winery;
             var winelist_url = TRUTH_LOCATION + "/winery/" + winery + "/wine";
             var that = this;
+            this.winelist_views = [];
             $.getJSON( winery_url, function(data){
                 that.model = new WineryDetailModel(data);
                 that.render();
             });
             $.getJSON( winelist_url, function(data){
-                //winelist
+                _.each(data, function(wine){
+                    var m = new SearchWineResult(wine);
+                    var swv = new SearchWineView({model:m});
+                    that.winelist_views.push(swv);
+                });
+                that.render();
             });
 
         },
         render: function(){
             obj = this.model.toJSON();
             this.$el.html(this.template(obj));
+            this.$("#winelist").html("");
+            var that = this;
+            _.each(this.winelist_views, function(wineview){
+                wineview.render();
+                that.$("#winelist").append(wineview.$el);
+            });
         }
     });
 
