@@ -216,6 +216,12 @@ $(function(){
             obj = this.model.toJSON();
             obj['winery'] = this.winery_model.get('name');
             this.$el.html(this.template(obj));
+        },
+        events: {
+            'click .winery':    'winery_click'
+        },
+        winery_click: function(){
+            app.navigate( "/winery/"+this.winery_model.get('id'), {trigger:true})
         }
     });
 
