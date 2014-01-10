@@ -20,8 +20,8 @@
 
   <script id="template-nav" type="text/x-handlers-template">
     <ul class="nav nav-tabs">
-      <li class="active"><a class='search'>Search</a></li>
-      <li><a class='cellar'>Cellar</a></li>
+      <li {{#if search}}class="active"{{/if}}><a class='search'>Search</a></li>
+      <li {{#if cellar}}class="active"{{/if}}><a class='cellar'>Cellar</a></li>
     </ul>
   </script>
 
@@ -40,6 +40,7 @@
     <form class="navbar-form navbar-left" role="search">
       <input id="search" type="text" class="form-control" placeholder="Search" />
     </form> 
+    <button type="button" class="add_winery btn btn-default navbar-btn">Add a Winery</button>
   </script>
 
   <script id="template-wine" type="text/x-handlebars-template">
@@ -58,7 +59,17 @@
     <h4>{{name}}</h4>
     <div class='location'>{{location}}</div>
   </script>
-  
+ 
+  <script id="template-winery-detail" type="text/x-handlebars-template">
+    <div class="container">
+      <h2>
+        <span class='name'>{{name}}</span>
+      </h2>
+    
+      <p> {{location}} </p> 
+    </div>
+  </script>
+
   <script id="template-wine-detail" type="text/x-handlebars-template">
     <div class="container">
       <h2> 
@@ -71,11 +82,35 @@
 
       <table class="table table-striped">
         <tr> <th>Winery</th> <td><a class='winery'>{{winery}}</a></td> </tr>
-        <tr> <th>Year</th> <td>{{year}}</td> </tr>
-        <tr> <th>Name</th> <td>{{name}}</td> </tr> 
-        <tr> <th>Type</th> <td>{{winetype}}</td> </tr>
+        <tr> <th>Year</th> 
+            {{#if year}}
+                <td> {{year}} </td> 
+            {{else}}
+                <td> <input type='text' placeholder='year' id='year' /> </td>
+            {{/if}}
+        </tr>
+        <tr> <th>Name</th> 
+            {{#if name}}
+                <td>{{name}}</td> </tr> 
+            {{else}}
+                <td> <input type='text' placeholder='name' id='name' /> </td>
+            {{/if}}
+        </tr>
+        <tr> <th>Type</th>
+            {{#if winetype}}
+                <td>{{winetype}}</td> 
+            {{else}}
+                <td> </td> 
+            {{/if}}
+        </tr>
         <tr> <th>Varietal</th> <td>{{varietal}}</td> </tr>
-        <tr> <th>UPC</th> <td>{{upc}}</td> </tr> 
+        <tr> <th>UPC</th>
+            {{#if upc}}
+                <td> {{upc}} </td>
+            {{else}}
+                <td> <input type='text' placeholder='upc' id='upc' /> </td>
+            {{/if}}
+        </tr> 
       </table>
 
     </div>

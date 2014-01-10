@@ -58,7 +58,7 @@ $(function(){
             "click": "clicked"
         },
         clicked: function(){
-            alert("Winery Description!");
+            app.navigate(this.model.get('url'), {trigger:true})
         }
     });
 
@@ -134,14 +134,21 @@ $(function(){
         }
     });
 
+    var NavModel = Backbone.Model.extend({});
+
     var NavView = Backbone.View.extend({
         template: Handlebars.compile($("#template-nav").html()),
         el: $("#nav"),
         initialize: function(){
+            this.model = new NavModel;
             this.render();
+            this.listenTo(this.model, 'change', this.render);
         },
         render: function(){
-            this.$el.html(this.template({}));
+            obj = this.model.toJSON();
+            obj['search'] = (obj['navstate'] === 'search');
+            obj['cellar'] = (obj['navstate'] === 'cellar');
+            this.$el.html(this.template(obj));
             return this;
         },
         events: {
@@ -152,6 +159,28 @@ $(function(){
             app.navigate("home", {trigger:true});
         },
         cellar: function(){
+        }
+    });
+
+    var WineryView = Backbone.View.extend({
+        template: Handlebars.compile($("#template-winery-detail").html()),
+        el: $("#mainwindow"),
+        load_winery: function(winery){
+            var winery_url = TRUTH_LOCATION + "/winery/" + winery;
+            var winelist_url = TRUTH_LOCATION + "/winery/" + winery + "/wine";
+            var that = this;
+            $.getJSON( winery_url, function(data){
+                that.model = new WineryDetailModel(data);
+                that.render();
+            });
+            $.getJSON( winelist_url, function(data){
+                //winelist
+            });
+
+        },
+        render: function(){
+            obj = this.model.toJSON();
+            this.$el.html(this.template(obj));
         }
     });
 
@@ -172,10 +201,6 @@ $(function(){
             });
         },
         render: function(){
-            if( this.winery_model === undefined || 
-                this.model === undefined ){
-                return;
-            }
             obj = this.model.toJSON();
             obj['winery'] = this.winery_model.get('name');
             this.$el.html(this.template(obj));
@@ -186,6 +211,7 @@ $(function(){
         routes: {
             "home":                         "home",
             "search/:query":                "search",
+            "winery/:winery":               "winery",
             "winery/:winery/wine/:wine":    "wine"
         },
         initialize: function(){
@@ -193,11 +219,13 @@ $(function(){
         },
         home: function(){
             this.App = new SearchView;
+            this.Nav.model.set("navstate", "search");
             this.listenTo(this.App.searchmodel, 'change', this.update_nav);
         },
         search: function(query){
             this.App = new SearchView;
             this.App.searchmodel.set("searchterm", query);
+            this.Nav.model.set("navstate", "search");
             this.listenTo(this.App.searchmodel, 'change', this.update_nav);
         },
         update_nav: function(model){
@@ -205,8 +233,14 @@ $(function(){
         },
         wine: function(winery, wine){
             this.App = new WineView();
+            this.Nav.model.set("navstate", "wine");
             this.App.load_wine(winery, wine);
         },
+        winery: function(winery){
+            this.App = new WineryView();
+            this.Nav.model.set("navstate", "winery");
+            this.App.load_winery(winery);
+        }
 
     });
 
