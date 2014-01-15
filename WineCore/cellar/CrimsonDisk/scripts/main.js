@@ -5,7 +5,8 @@ requirejs.config({
 require(["nav", 
          "search", 
          "wine", 
-         "winery"], function(nav, search, wine, winery){
+         "winery", 
+         "handlebars"], function(nav, search, wine, winery, handlebars){
 
     if (nav === undefined || search === undefined || wine === undefined ||
             winery === undefined){

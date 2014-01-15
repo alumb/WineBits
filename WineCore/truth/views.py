@@ -130,10 +130,8 @@ class VarietalHandler(MyHandler):
     """
     /varietal : all varietals
     """
-    #TODO: test VarietalHandler
-    #TODO: create fuzzy Varietal
     def get(self):
-        response = [{'varietal':varietal}
+        response = [varietal
                     for varietal in wine_types.wine_options]
         self.json_response(response)
 
@@ -143,9 +141,7 @@ class WineTypeHandler(MyHandler):
     """
     #TODO: test WineTypeHandler
     def get(self):
-        response = [{'winetype':winetype}
-                    for winetype in wine_types.types]
-        self.json_response(response)
+        self.json_response(wine_types.types)
 
 class CountryHandler(MyHandler):
     """

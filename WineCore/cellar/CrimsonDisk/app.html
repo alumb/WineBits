@@ -8,14 +8,10 @@
   <meta name="author" content="WineBits:classam">
 
   <link rel="stylesheet" href="/style/css/bootstrap.min.css" />
-  <link rel="stylesheet" href="../../style/css/bootstrap.min.css" />
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-  <script src="/style/js/bootstrap.min.js"></script>
-  <script src="../../style/js/bootstrap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.0/backbone-min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js"></script>
-  <script data-main="scripts/main" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.9/require.min.js"></script> 
+  <link rel="stylesheet" href="select2.css" />
+  <link rel="stylesheet" href="select2-bootstrap.css" />
+  <script src="libs.js" type="application/javascript"> </script>
+  <script data-main="scripts/main" src="require.js"></script> 
 
   <script id="template-nav" type="text/x-handlers-template">
     <ul class="nav nav-tabs">
@@ -86,31 +82,60 @@
             {{#if year}}
                 <td> {{year}} </td> 
             {{else}}
-                <td> <input type='text' placeholder='year' id='year' /> </td>
+                <td> <input type='number' placeholder='year' id='year' class='form-control' /> </td>
             {{/if}}
         </tr>
         <tr> <th>Name</th> 
             {{#if name}}
                 <td>{{name}}</td> </tr> 
             {{else}}
-                <td> <input type='text' placeholder='name' id='name' /> </td>
+                <td> <input type='text' placeholder='name' id='name' class='form-control' /> </td>
             {{/if}}
         </tr>
         <tr> <th>Type</th>
             {{#if winetype}}
                 <td>{{winetype}}</td> 
             {{else}}
-                <td> </td> 
+                <td> 
+                <div class='form-group'>
+                    <select id="winetype" class='form-control'>
+                    {{#each winetype_options}}
+                        <option val="{{this}}">{{this}}</option>
+                    {{/each}}
+                    </select>
+                </div>
+                </td>
             {{/if}}
         </tr>
-        <tr> <th>Varietal</th> <td>{{varietal}}</td> </tr>
+        <tr> <th><label for="varietal">Varietal</label></th>
+            {{#if varietal}}
+                <td>{{varietal}}</td> 
+            {{else}}
+                <td> 
+                <div class='form-group'>
+                    <select id="varietal" class='form-control'>
+                    {{#each varietal_options}}
+                        <option val="{{this}}">{{this}}</option>
+                    {{/each}}
+                    </select>
+                    <input type='text' placeholder='other' id='other_varietal' class='form-control' /> 
+                </div>
+                </td>
+            {{/if}}
+        </tr>
         <tr> <th>UPC</th>
             {{#if upc}}
                 <td> {{upc}} </td>
             {{else}}
-                <td> <input type='text' placeholder='upc' id='upc' /> </td>
+                <td> <input type='text' placeholder='upc' id='upc' class='form-control' /> </td>
             {{/if}}
         </tr> 
+        {{#each extra_keys}}
+        <tr>
+            <th>{{capitalize key}}</th>
+            <td>{{value}}</td>
+        </tr>
+        {{/each}}
       </table>
 
     </div>
