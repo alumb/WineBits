@@ -1,0 +1,3 @@
+URL: http://winebits.appspot.com/
+
+cellar: http://winebits.appspot.com/cellar/index.html
