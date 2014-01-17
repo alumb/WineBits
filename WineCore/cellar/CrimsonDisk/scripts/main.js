@@ -38,13 +38,15 @@ require(["nav",
             this.listenTo(this.App.searchmodel, 'change', this.update_nav);
         },
         search: function(query){
+            console.log("Rendering search");
             this.App = new search.SearchView({ router:this });
             this.App.searchmodel.set("searchterm", query);
             this.Nav.model.set("navstate", "search");
             this.listenTo(this.App.searchmodel, 'change', this.update_nav);
         },
         update_nav: function(model){
-            app.navigate("search/"+model.get('searchterm'))
+            var searchterm = encodeURIComponent(model.get('searchterm'))
+            app.navigate("search/"+searchterm, {trigger:false, replace:true})
         },
         wine: function(winery_id, wine_id){
             this.App = new wine.WineView({ router:this });
