@@ -1,6 +1,6 @@
-from cellar.SpruceHat.models.base import BaseModel
-from cellar.SpruceHat.constants import MAX_RESULTS
-from cellar.SpruceHat.stubs import ndb, search
+from truth.models.base import BaseModel
+from truth.constants import MAX_RESULTS
+from truth.stubs import ndb, search
 from truth.models.wine import Wine
 
 class WineBottle(BaseModel):

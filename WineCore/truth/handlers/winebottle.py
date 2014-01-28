@@ -1,7 +1,7 @@
-from cellar.SpruceHat.stubs import debug, webapp2, ndb
-from cellar.SpruceHat.views.JsonView import JsonView
-from cellar.SpruceHat.models.WineBottle import WineBottle
-from cellar.SpruceHat.constants import MAX_RESULTS
+from truth.stubs import debug, webapp2, ndb
+from truth.views.jsonview import json_response 
+from truth.models.winebottle import WineBottle
+from truth.constants import MAX_RESULTS
 from google.appengine.api import users
 from truth.models.wine import Wine
 from truth.models.winery import Winery
@@ -39,10 +39,10 @@ class InventoryHandler(webapp2.RequestHandler):
             jsondict = wineBottle.to_dict()
             jsondict["wine"] = wine.to_dict()
             
-            JsonView.json_response(self, jsondict)
+            json_response(self, jsondict)
 
         else:
-            JsonView.json_response(self, {"error":"there was no wine_id","post":self.request.body})
+            json_response(self, {"error":"there was no wine_id","post":self.request.body})
 
     def delete(self):
         # post = json.loads(self.request.body)[0]
@@ -52,10 +52,10 @@ class InventoryHandler(webapp2.RequestHandler):
         #     wine_key = ndb.Key(Winery, int(post['winery_id']), Wine, int(post['wine_id']))
         #     wine = wine_key.get()
             
-        #     JsonView.json_response(self, {"success":True})
+        #     json_response(self, {"success":True})
 
         # else:
-            JsonView.json_response(self, {"success":False})
+            json_response(self, {"success":False})
 
 class WineBottleHandler(webapp2.RequestHandler):         
     def get(self,wine_bottle_key_urlsafe):
@@ -67,7 +67,7 @@ class WineBottleHandler(webapp2.RequestHandler):
             jsondict = wine_bottle.to_dict()
             jsondict["wine"] = wine_bottle_key.parent().get().to_dict()
             jsondict["winery"] = wine_bottle_key.parent().parent().get().to_dict()
-            JsonView.json_response(self, jsondict)
+            json_response(self, jsondict)
 
 
 
