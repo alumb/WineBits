@@ -1,5 +1,5 @@
 from truth.handlers import root, location, varietal, winetype, region, winery
-from truth.handlers import wine, search, winebottle
+from truth.handlers import wine, search, cellar, winebottle
 from truth.stubs import debug, webapp2
 
 if debug:
@@ -16,7 +16,8 @@ handler_modules = [
     winery, 
     wine, 
     search,
-    winebottle
+    winebottle,
+    cellar
 ]
 
 routes = []
