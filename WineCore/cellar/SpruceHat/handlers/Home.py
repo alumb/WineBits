@@ -5,7 +5,7 @@ import os
 import json
 
 
-class HomeController(webapp2.RequestHandler):
+class HomeHandler(webapp2.RequestHandler):
     """
     / : returns a 'hello' sort of deal. 
     """
@@ -31,5 +31,5 @@ class HomeController(webapp2.RequestHandler):
                 """)
 
 routes = [
-            (r'/', HomeController), 
+            (r'/', HomeHandler), 
         ]
