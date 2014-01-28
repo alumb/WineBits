@@ -9,7 +9,6 @@ env_variables:
   GOOGLE: True
 
 includes:
-- cellar/SpruceHat/SpruceHat.yaml
 - cellar/PineSocks/WineCellar.yaml
 
 handlers:

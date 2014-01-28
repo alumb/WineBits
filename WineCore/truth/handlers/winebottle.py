@@ -14,7 +14,7 @@ class InventoryHandler(webapp2.RequestHandler):
         qry = WineBottle.query()        
         results = qry.fetch(MAX_RESULTS)
 
-        JsonView.json_response(self, [x.to_JSON() for x in results])
+        json_response(self, [x.to_JSON() for x in results])
 
     def post(self):
 
