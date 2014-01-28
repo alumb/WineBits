@@ -163,7 +163,7 @@ class Winery(BaseModel):
         >>> post['json_thing'] = 'blerg'
         >>> v = Winery()
         >>> v.location
-        <stubs.StringProperty ...>
+        <truth.stubs.StringProperty ...>
         >>> database_key = v.create(post)
 
         And update the location:
@@ -272,7 +272,7 @@ class Winery(BaseModel):
 
         >>> v = Winery()
         >>> v.create({'name':'Winery'})
-        <stubs.Key object...>
+        <truth.stubs.Key object...>
         >>> v.private_token
         'stub-uuid'
         >>> v.verify('butts')
@@ -416,7 +416,7 @@ class Winery(BaseModel):
         >>> v = Winery()
         >>> v.set_location("What is this I don't even")
         >>> v.country
-        <stubs.StringProperty instance at ...>
+        <truth.stubs.StringProperty instance at ...>
         >>> v.location_fuzzy
         "What is this I don't even"
 

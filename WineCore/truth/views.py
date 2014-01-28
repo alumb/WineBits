@@ -5,177 +5,9 @@ from truth.models.event import Event
 from truth.stubs import webapp2, ndb, debug, search
 from truth import regions, wine_types
 
-import os
-import json
 
 
-def get_url(model):
-    """
-        >>> v = Winery()
-        >>> key = v.create({'name':'Winery'})
-        >>> get_url(v)
-        '/winery/stub-key'
-
-        >>> w = Wine(parent=key)
-        >>> key = w.create({'winetype':'Red', 'year':'2010'}, v)
-        >>> get_url(w)
-        '/winery/stub-key/wine/stub-key'
-    """
-    if isinstance(model, Winery):
-        return "/winery/%s" % str(model.key.id())
-    if isinstance(model, Wine):
-        parent_key = model.key.parent()
-        return "/winery/%s/wine/%s" % (str(parent_key.id()), str(model.key.id()))
-    return None
-
-
-class MyHandler(webapp2.RequestHandler):
-    @staticmethod
-    def json(model):
-        """
-        Converts Models into dicts
-        >>> v = Winery()
-        >>> key = v.create({'name':'Winery'})
-        >>> MyHandler.json(v)
-        {...'name': 'Winery'...}
-
-        Adds Model links
-        >>> MyHandler.json(v)
-        {...'url': '/winery/stub-key'...}
-
-        Flattens json elements
-        >>> MyHandler.json({'json':{'thing':'awesome'}})
-        {...'thing': 'awesome'...}
-        """
-        try:
-            url = get_url(model)
-            try:
-                id_ = model.key.id()
-            except:
-                id_ = None
-            if not isinstance(model, dict):
-                object_ = model.to_dict()
-            else:
-                object_ = model
-            if object_ and 'json' in object_ and object_['json']:
-                for key, value in object_['json'].iteritems():
-                    object_[key] = value
-                del object_['json']
-            if url:
-                object_['url'] = url
-            if id_:
-                object_['id'] = id_
-            return object_
-        except AttributeError as e:
-            return model
-
-    def json_response(self, model):
-        """
-        Return object_ as JSON, with 'application/json' type.
-        Strip out any 'json' field
-
-        """
-        if type(model) != list:
-            object_ = MyHandler.json(model)
-        else:
-            object_ = [MyHandler.json(o) for o in model]
-
-        self.response.content_type="application/json"
-        if debug:
-            self.response.write( json.dumps(object_, indent=2 ))
-        else:
-            self.response.write( json.dumps(object_) )
-
-
-class BaseHandler(MyHandler):
-    """
-    / : returns a 'hello' sort of deal. 
-    """
-
-    def get(self):
-        self.response.write("""<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>WineBits: WineTruth</title>
-    <link rel="stylesheet" href="/style/css/bootstrap.min.css" />
-    <script src="/style/js/bootstrap.min.js"></script>
-    <link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,100,700,300' rel='stylesheet' type='text/css'>
-  </head>
-  <body>
-    <h1> Welcome to WineTruth. </h1>
-    <p> The documentation is available 
-    <a href='https://github.com/alumb/WineBits/blob/master/WineCore/truth/README.md'>here</a></p>
-  </body>
-</html>
-            """)
-
-class LocationHandler(MyHandler):
-    """
-    GET /location : an exhaustive list of every location
-    GET /location?fuzzy=true : every location_fuzzy
-    """
-    #TODO: test LocationHandler
-    def get(self):
-        if 'fuzzy' in self.request.GET:
-            response = [{'location_fuzzy':location}
-                        for location in Winery.all_fuzzy_locations()]
-            self.json_response(response)
-        else:
-            response = [{'location':location}
-                        for location in regions.location_list]
-            self.json_response(response)
-
-class VarietalHandler(MyHandler):
-    """
-    /varietal : all varietals
-    """
-    def get(self):
-        response = [varietal
-                    for varietal in wine_types.wine_options]
-        self.json_response(response)
-
-class WineTypeHandler(MyHandler):
-    """
-    /winetype : all wine-types
-    """
-    #TODO: test WineTypeHandler
-    def get(self):
-        self.json_response(wine_types.types)
-
-class CountryHandler(MyHandler):
-    """
-    GET /country : list countries
-    """
-    #TODO: test CountryHandler
-
-    def get(self):
-        response = [{'country':country} for country in regions.countries]
-        self.json_response(response)
-
-class RegionHandler(MyHandler):
-    """
-    GET /country/Canada : list regions
-    """
-    #TODO: test RegionHandler
-
-    def get(self, country):
-        response = [{'region':region,'country':country}
-                    for region in regions.regions_for_country(country)]
-        self.json_response(response)
-
-class SubRegionHandler(MyHandler):
-    """
-    GET /country/Canada/British Columbia : list subregions
-    """
-    #TODO: test SubRegionHandler
-
-    def get(self, country):
-        response = [{'subregion': subregion}
-                     for subregion in regions.subregions_for_country(country, region)]
-        self.json_response(response)
-
-class WineryBaseHandler(MyHandler):
+class WineryBaseHandler(webapp2.RequestHandler):
     """
     GET /winery : fetch a set of winerys
     POST /winery : create a winery
@@ -253,7 +85,7 @@ class WineryBaseHandler(MyHandler):
         self.json_response(winery)
 
 
-class WineryHandler(MyHandler):
+class WineryHandler(webapp2.RequestHandler):
     """
     /winery/<id>
     """
@@ -318,7 +150,7 @@ class WineryHandler(MyHandler):
         self.json_response(winery)
 
 
-class WineryWineBaseHandler(MyHandler):
+class WineryWineBaseHandler(webapp2.RequestHandler):
     def get(self, winery_id):
         """
         /winery/12345/wine => all wines for winery
@@ -359,7 +191,7 @@ class WineryWineBaseHandler(MyHandler):
 
         self.json_response(wine)
 
-class WineryWineHandler(MyHandler):
+class WineryWineHandler(webapp2.RequestHandler):
     def get(self, winery_id, wine_id):
         wine_key = ndb.Key(Winery, int(winery_id), Wine, int(wine_id))
         wine = wine_key.get()
@@ -398,7 +230,7 @@ class WineryWineHandler(MyHandler):
 
 
 
-class SearchHandler(MyHandler):
+class SearchHandler(webapp2.RequestHandler):
     """
     /search
     """
@@ -453,14 +285,6 @@ class SearchHandler(MyHandler):
         self.json_response(response)
 
 
-routes = [
-            (r'/', BaseHandler), 
-            (r'/location/?', LocationHandler),
-            (r'/winetype/?', WineTypeHandler),
-            (r'/varietal/?', VarietalHandler),
-            (r'/country/?', CountryHandler),
-            (r'/country/([\w\s\d%]+)/?', RegionHandler),
-            (r'/country/([\w\s\d%]+)/([\w\s\d%]+)/?', SubRegionHandler),
             (r'/winery/?', WineryBaseHandler),
             (r'/winery/(\d+)/?', WineryHandler),
             (r'/winery/(\d+)/wine/?', WineryWineBaseHandler),

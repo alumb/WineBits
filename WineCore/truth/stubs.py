@@ -11,7 +11,7 @@ uuid
 search
 
 >>> ndb.Model(variable='awesome', thing='thang')
-<stubs.Model object at ...>
+<truth.stubs.Model object at ...>
 
 """
 import os
@@ -165,6 +165,7 @@ else:
     class FakeRequest(object):
         def __init__(self, *args, **kwargs):
             self.POST = {}
+        remote_addr = ""
 
     class FakeResponse(object):
         def __init__(self, *args, **kwargs):
