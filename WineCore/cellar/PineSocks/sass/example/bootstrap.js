@@ -846,11 +846,29 @@ Ext.ClassManager.addNameAlternateMappings({
   "ExtThemeNeptune.toolbar.Toolbar": [],
   "WineCellar.Application": [],
   "WineCellar.controller.Main": [],
+  "WineCellar.controller.WineInventory": [],
   "WineCellar.controller.WineTruth": [],
+  "WineCellar.model.Location": [],
+  "WineCellar.model.Varietal": [],
   "WineCellar.model.Wine": [],
-  "WineCellar.store.WineTruth": [],
+  "WineCellar.model.WineBottle": [],
+  "WineCellar.model.WineType": [],
+  "WineCellar.model.Winery": [],
+  "WineCellar.store.Locations": [],
+  "WineCellar.store.Varietals": [],
+  "WineCellar.store.WineInventory": [],
+  "WineCellar.store.WineTypes": [],
+  "WineCellar.store.Wineries": [],
+  "WineCellar.store.Wines": [],
+  "WineCellar.store.writer.Rest": [],
+  "WineCellar.view.AssociationColumn": [
+    "Ext.grid.AssociationColumn"
+  ],
+  "WineCellar.view.Inventory": [],
+  "WineCellar.view.InventoryList": [],
   "WineCellar.view.Main": [],
   "WineCellar.view.Viewport": [],
+  "WineCellar.view.WineBottleEdit": [],
   "WineCellar.view.WineTruthList": []
 });
 Ext.ClassManager.addNameAliasMappings({
@@ -1856,13 +1874,39 @@ Ext.ClassManager.addNameAliasMappings({
   "ExtThemeNeptune.toolbar.Toolbar": [],
   "WineCellar.Application": [],
   "WineCellar.controller.Main": [],
+  "WineCellar.controller.WineInventory": [],
   "WineCellar.controller.WineTruth": [],
+  "WineCellar.model.Location": [],
+  "WineCellar.model.Varietal": [],
   "WineCellar.model.Wine": [],
-  "WineCellar.store.WineTruth": [],
+  "WineCellar.model.WineBottle": [],
+  "WineCellar.model.WineType": [],
+  "WineCellar.model.Winery": [],
+  "WineCellar.store.Locations": [],
+  "WineCellar.store.Varietals": [],
+  "WineCellar.store.WineInventory": [],
+  "WineCellar.store.WineTypes": [],
+  "WineCellar.store.Wineries": [],
+  "WineCellar.store.Wines": [],
+  "WineCellar.store.writer.Rest": [
+    "writer.rest"
+  ],
+  "WineCellar.view.AssociationColumn": [
+    "widget.associationcolumn"
+  ],
+  "WineCellar.view.Inventory": [
+    "widget.Inventory"
+  ],
+  "WineCellar.view.InventoryList": [
+    "widget.InventoryList"
+  ],
   "WineCellar.view.Main": [
     "widget.app-main"
   ],
   "WineCellar.view.Viewport": [],
+  "WineCellar.view.WineBottleEdit": [
+    "widget.WineBottleEdit"
+  ],
   "WineCellar.view.WineTruthList": [
     "widget.WineTruthList"
   ]

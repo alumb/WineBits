@@ -105,7 +105,7 @@ Parent: cellar
 Parent: cellar
 #### fields ####
 - id: 5665783417929728
-- user_id: 1234567890123456
+- wine_key: 1234567890123456
 - bottleSize: "750ml"
 - storageLocation1: "cellar"
 - storageLocation2: "Rack 5 row 2"
