@@ -19,7 +19,7 @@ Ext.define('WineCellar.model.WineBottle', {
 	}],
 	proxy: {
 		type: 'rest',
-		url:"server/inventory",
+		url:"../truth/inventory",
 		noCache:false,
 		reader: {
 			type: 'json',
