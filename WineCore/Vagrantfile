@@ -90,9 +90,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.data_bags_path = "chef/data_bags"
     chef.add_recipe "apt" 
     chef.add_recipe "gae" 
-    chef.add_recipe "heroic"
+    chef.add_recipe "winebits"
     chef.add_recipe "java" 
     chef.add_recipe "SenchaCmd"
+    chef.add_recipe "nodejs"
+    chef.add_recipe "phonegap"
     #chef.json = {
     #  :java => {
     #    :install_flavor => 'openjdk',
