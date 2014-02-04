@@ -1,9 +1,11 @@
 from truth.models.wine import Wine
 from truth.models.winery import Winery
-from truth.stubs import debug
+from truth.stubs import debug, ndb
 from datetime import datetime, date
 from google.appengine.api import users
 import json
+
+import logging
 
 def get_url(model):
     """
@@ -25,7 +27,7 @@ def get_url(model):
     return None
 
 
-def model_to_json(model):
+def model_to_json(model, extended_listing=False):
     """
     Converts Models into dicts
     >>> v = Winery()
@@ -60,27 +62,40 @@ def model_to_json(model):
         if id_:
             object_['id'] = id_
         for key, value in object_.iteritems():
+            if issubclass(type(value), ndb.Key):
+                if extended_listing:
+                    object_[key] = model_to_json(value.get(), extended_listing)
+                else :
+                    object_[key] = value.id()
             if issubclass(type(value), date):
                 object_[key] = value.strftime("%Y/%m/%d")
             elif issubclass(type(value), users.User):
                 object_[key] = value.user_id()
             # else:
             #     logging.info(key + " -- " + str(type(value)))
+        
+        if extended_listing:
+            parent = model.key.parent()
+            while parent != None:
+                object_[parent.kind()] = model_to_json(parent.get(), extended_listing)
+                parent = parent.parent()
+
+
         return object_
     except AttributeError as e:
         return model
 
 
-def json_response(handler, model):
+def json_response(handler, model, extended_listing=False):
     """
     Return object_ as JSON, with 'application/json' type.
     Strip out any 'json' field
 
     """
     if type(model) != list:
-        object_ = model_to_json(model)
+        object_ = model_to_json(model, extended_listing)
     else:
-        object_ = [model_to_json(o) for o in model]
+        object_ = [model_to_json(o, extended_listing) for o in model]
 
     handler.response.content_type="application/json"
     if debug:

@@ -10,7 +10,7 @@ class UserWine(BaseModel):
     tags = ndb.StringProperty(repeated=True) # list of tags
 
     def config(self, data):
-        self.apply(["drink_before","drink_after"],data);
+        self.apply(["drink_before","drink_after"],data)
         if 'user_id' in data:
             self['user'] = data['user_id']
             del data['user_id']
@@ -20,6 +20,7 @@ class UserWine(BaseModel):
             if type(tags) != list:
                 tags = [tags]
             self.tags = list(set(self.tags + tags)) 
+            del data['tags']
 
     def create(self, data):
         self.config(data)

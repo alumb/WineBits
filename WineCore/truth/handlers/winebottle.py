@@ -22,7 +22,7 @@ class WineBottleBaseHandler(webapp2.RequestHandler):
         qry = WineBottle.query(ancestor=cellar.key)        
         results = qry.fetch(MAX_RESULTS)
 
-        json_response(self, [x.to_JSON() for x in results])
+        json_response(self, results, True)
 
     def post(self, cellar_id):
 
@@ -44,13 +44,13 @@ class WineBottleBaseHandler(webapp2.RequestHandler):
             del post['wine_id']
             del post['winery_id']
 
-            wineBottle = WineBottle(parent=cellar_key)
-            wineBottle.wine = wine.key
+            bottle = WineBottle(parent=cellar_key)
+            bottle.wine = wine.key
 
-            key = wineBottle.update(post)
+            key = bottle.create(post)
 
             self.response.content_type="application/json"
-            json_response(self, bottle.to_JSON())
+            json_response(self, bottle)
 
         else:
             json_response(self, {"error":"there was no wine_id","post":self.request.body})
@@ -66,7 +66,7 @@ class WineBottleHandler(webapp2.RequestHandler):
             self.response.status = "404 Not Found"
             return
 
-        json_response(self, bottle.to_JSON())
+        json_response(self, bottle)
 
     def post(self,cellar_id,winebottle_id):
         bottle_key = ndb.Key(WineCellar, int(cellar_id), WineBottle, int(winebottle_id))
@@ -89,10 +89,10 @@ class WineBottleHandler(webapp2.RequestHandler):
 
             bottle.wine = wine.key
 
-            key = bottle.update(post)
+            key = bottle.modify(post)
 
             self.response.content_type="application/json"
-            json_response(self, bottle.to_JSON())
+            json_response(self, bottle)
 
         else:
             json_response(self, {"error":"there was no wine_id","post":self.request.body})
