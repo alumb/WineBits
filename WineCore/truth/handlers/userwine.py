@@ -28,35 +28,35 @@ class UserWineBaseHandler(webapp2.RequestHandler):
 
         json_response(self, userwine)
 
-# class UserWineHandler(webapp2.RequestHandler):
-#     def get(self, userwine_id):
+class UserWineHandler(webapp2.RequestHandler):
+    def get(self, winery_id, wine_id, userwine_id):
 
-#         userwine_key = ndb.Key(UserWine, int(userwine_id))
-#         userwine = userwine_key.get()
-#         if not userwine:
-#             self.response.write("404 Not Found")
-#             self.response.status = "404 Not Found"
-#             return
+        userwine_key = ndb.Key(Winery, int(winery_id), Wine, int(wine_id), UserWine, int(userwine_id))
+        userwine = userwine_key.get()
+        if not userwine:
+            self.response.write("404 Not Found")
+            self.response.status = "404 Not Found"
+            return
 
-#         json_response(self, userwine)
+        json_response(self, userwine)
 
-#     def post(self, userwine_id):
-#         post = self.request.POST
+    def post(self, winery_id, wine_id, userwine_id):
+        post = self.request.POST
 
-#         userwine_key = ndb.Key(UserWine, int(userwine_id))
-#         userwine = userwine_key.get()
-#         userwine.modify(post)
-#         #Event.create(self.request.remote_addr, "UserWine", key)
+        userwine_key = ndb.Key(Winery, int(winery_id), Wine, int(wine_id), UserWine, int(userwine_id))
+        userwine = userwine_key.get()
+        userwine.modify(post)
+        #Event.create(self.request.remote_addr, "UserWine", key)
 
-#         json_response(self, userwine)
+        json_response(self, userwine)
 
-#     def delete(self, userwine_id):
-#         userwine_key = ndb.Key(UserWine, int(userwine_id))
-#         userwine = userwine_key.get()
-#         userwine.delete()
-#         json_response(self, {"success":True})
+    def delete(self, winery_id, wine_id, userwine_id):
+        userwine_key = ndb.Key(Winery, int(winery_id), Wine, int(wine_id), UserWine, int(userwine_id))
+        userwine = userwine_key.get()
+        userwine.delete()
+        json_response(self, {"success":True})
 
 routes = [
     (r'/winery/(\d+)/wine/(\d+)/userwine/?', UserWineBaseHandler),
-    #(r'/winery/(\d+)/wine/(\d+)/userwine/(\d+)/?', UserWineHandler),
+    (r'/winery/(\d+)/wine/(\d+)/userwine/(\d+)/?', UserWineHandler),
 ]

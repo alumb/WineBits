@@ -19,7 +19,7 @@ class UserWine(BaseModel):
             tags = json.loads(data['tags'])
             if type(tags) != list:
                 tags = [tags]
-            self.tags += tags
+            self.tags = list(set(self.tags + tags)) 
 
     def create(self, data):
         self.config(data)
