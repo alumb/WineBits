@@ -1,4 +1,5 @@
 from truth.stubs import ndb
+from datetime import datetime
 import json
 
 class YouNeedATokenForThat(Exception):
@@ -12,6 +13,18 @@ class BaseModel(ndb.Model):
         dict_ = self.to_dict()
         return (key in dict_ and dict_[key] and dict_[key] != ""
                 and dict_[key] != {})
+
+    def apply(self, fields, data):
+        for field in fields:
+            if field in data:
+                value = None
+                fieldType = type(getattr(type(self),field))
+                if fieldType == ndb.DateProperty:
+                    value = datetime.strptime(data[field], '%Y/%m/%d')
+                else:
+                    value = data[field]
+                setattr(self,field, value)
+                del data[field]
 
     @staticmethod
     def partial_search_string(string):

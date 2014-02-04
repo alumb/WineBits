@@ -1,7 +1,9 @@
 from truth.models.wine import Wine
 from truth.models.winery import Winery
 from truth.stubs import debug
-import json 
+from datetime import datetime, date
+from google.appengine.api import users
+import json
 
 def get_url(model):
     """
@@ -57,6 +59,13 @@ def model_to_json(model):
             object_['url'] = url
         if id_:
             object_['id'] = id_
+        for key, value in object_.iteritems():
+            if issubclass(type(value), date):
+                object_[key] = value.strftime("%Y/%m/%d")
+            elif issubclass(type(value), users.User):
+                object_[key] = value.user_id()
+            # else:
+            #     logging.info(key + " -- " + str(type(value)))
         return object_
     except AttributeError as e:
         return model

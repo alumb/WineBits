@@ -7,41 +7,27 @@ from datetime import datetime
 class WineBottle(BaseModel):
     # Parent: wine
     wine = ndb.KeyProperty()
-    drinkAfter = ndb.DateProperty()
-    drinkBefore = ndb.DateProperty()
-    purchaseDate = ndb.DateProperty()
-    purchaseLocation = ndb.StringProperty()
+    purchase_date = ndb.DateProperty()
+    purchase_location = ndb.StringProperty()
     cost = ndb.IntegerProperty() # Stored as number of cents
     value = ndb.IntegerProperty() # values 1-5
     consumed = ndb.BooleanProperty()
-    consumedDate = ndb.DateProperty()
+    consumed_date = ndb.DateProperty()
 
     json = ndb.JsonProperty(indexed=False)
 
     def update(self, data):
-        drinkAfter = None
-        if 'drinkAfter' in data:
-            drinkAfter = datetime.strptime(data['drinkAfter'], '%Y/%m/%d')
-            self.drinkAfter = drinkAfter
-            del data['drinkAfter']
+        purchase_date = None
+        if 'purchase_date' in data and data['purchase_date'] != '':
+            purchase_date = datetime.strptime(data['purchase_date'], '%Y/%m/%d')
+            self.purchase_date = purchase_date
+            del data['purchase_date']
 
-        drinkBefore = None
-        if 'drinkBefore' in data:
-            drinkBefore = datetime.strptime(data['drinkBefore'], '%Y/%m/%d')
-            self.drinkBefore = drinkBefore
-            del data['drinkBefore']
-
-        purchaseDate = None
-        if 'purchaseDate' in data and data['purchaseDate'] != '':
-            purchaseDate = datetime.strptime(data['purchaseDate'], '%Y/%m/%d')
-            self.purchaseDate = purchaseDate
-            del data['purchaseDate']
-
-        purchaseLocation = None
-        if 'purchaseLocation' in data and data['purchaseLocation'] != '':
-            purchaseLocation = data['purchaseLocation']
-            self.purchaseLocation = purchaseLocation
-            del data['purchaseLocation']
+        purchase_location = None
+        if 'purchase_location' in data and data['purchase_location'] != '':
+            purchase_location = data['purchase_location']
+            self.purchase_location = purchase_location
+            del data['purchase_location']
 
         cost = None
         if 'cost' in data and data['cost'] != '':
@@ -61,11 +47,11 @@ class WineBottle(BaseModel):
             self.consumed = consumed
             del data['consumed']
 
-        consumedDate = None
-        if 'consumedDate' in data and data['consumedDate'] != '':
-            consumedDate = datetime.strptime(data['consumedDate'], '%Y/%m/%d')
-            self.consumedDate = consumedDate
-            del data['consumedDate']
+        consumed_date = None
+        if 'consumed_date' in data and data['consumed_date'] != '':
+            consumed_date = datetime.strptime(data['consumed_date'], '%Y/%m/%d')
+            self.consumed_date = consumed_date
+            del data['consumed_date']
 
         json = BaseModel.tidy_up_the_post_object(data)
         self.json = json
@@ -81,17 +67,11 @@ class WineBottle(BaseModel):
         jsondict["id"] = self.key.id()
         jsondict["url"] = "/cellar/" + str(self.key.parent().id()) + "/wine/" + str(self.key.id())
         
-        if "drinkAfter" in jsondict and jsondict["drinkAfter"] is not None:
-            jsondict["drinkAfter"] = jsondict["drinkAfter"].strftime("%Y/%m/%d")
+        if "purchase_date" in jsondict and jsondict["purchase_date"] is not None:
+            jsondict["purchase_date"] = jsondict["purchase_date"].strftime("%Y/%m/%d")
 
-        if "drinkBefore" in jsondict and jsondict[ "drinkBefore"] is not None:
-            jsondict["drinkBefore"] = jsondict["drinkBefore"].strftime("%Y/%m/%d")
-
-        if "purchaseDate" in jsondict and jsondict["purchaseDate"] is not None:
-            jsondict["purchaseDate"] = jsondict["purchaseDate"].strftime("%Y/%m/%d")
-
-        if "consumedDate" in jsondict and jsondict["consumedDate"] is not None:
-            jsondict["consumedDate"] = jsondict["consumedDate"].strftime("%Y/%m/%d")
+        if "consumed_date" in jsondict and jsondict["consumed_date"] is not None:
+            jsondict["consumed_date"] = jsondict["consumed_date"].strftime("%Y/%m/%d")
         
         jsondict["wine"] = self.wine.get().to_dict()
         jsondict["wine"]["winery"] = self.wine.parent().get().to_dict()
