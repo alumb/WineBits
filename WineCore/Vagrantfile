@@ -91,21 +91,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.add_recipe "apt" 
     chef.add_recipe "always_useful"
     chef.add_recipe "gae" 
-    chef.add_recipe "java" 
-    chef.add_recipe "SenchaCmd"
+    #chef.add_recipe "java" 
+    #chef.add_recipe "SenchaCmd"
     chef.add_recipe "nodejs"
     chef.add_recipe "phonegap"
     
     chef.add_recipe "winebits"
-    #chef.json = {
-    #  :java => {
-    #    :install_flavor => 'openjdk',
-    #    :jdk_version => 7,
-    #    :oracle => {
-    #      "accept_oracle_download_terms" => true
-    #    }
-    #  }
-    #}
   end
 
   # Enable provisioning with chef server, specifying the chef server URL,
