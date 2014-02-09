@@ -2,8 +2,15 @@ from truth.stubs import webapp2, ndb
 from truth.views.jsonview import json_response 
 from truth.models.event import Event
 from truth.models.cellar import WineCellar
+from truth.constants import MAX_RESULTS
+
 
 class CellarBaseHandler(webapp2.RequestHandler):
+    def get(self):
+        qry = WineCellar.query()        
+        results = qry.fetch(MAX_RESULTS)
+        json_response(self, results, True)
+
     def post(self):
         post = self.request.POST
 
