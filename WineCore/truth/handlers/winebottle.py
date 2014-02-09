@@ -1,13 +1,11 @@
-from truth.stubs import debug, webapp2, ndb
+from truth.stubs import webapp2, ndb
 from truth.views.jsonview import json_response 
 from truth.models.winebottle import WineBottle
 from truth.constants import MAX_RESULTS
-from google.appengine.api import users
 from truth.models.wine import Wine
 from truth.models.winery import Winery
 from truth.models.cellar import WineCellar
-
-import json
+from truth.event import Event
 
 class WineBottleBaseHandler(webapp2.RequestHandler):
     def get(self, cellar_id):
@@ -48,6 +46,8 @@ class WineBottleBaseHandler(webapp2.RequestHandler):
             bottle.wine = wine.key
 
             key = bottle.create(post)
+            
+            Event.create(self.request.remote_addr, "WineBottle", key)
 
             self.response.content_type="application/json"
             json_response(self, bottle)
@@ -91,6 +91,8 @@ class WineBottleHandler(webapp2.RequestHandler):
 
             key = bottle.modify(post)
 
+            Event.update(self.request.remote_addr, "WineBottle", key)           
+
             self.response.content_type="application/json"
             json_response(self, bottle)
 
@@ -108,6 +110,9 @@ class WineBottleHandler(webapp2.RequestHandler):
             return
         
         bottle.delete()
+
+        Event.create(self.request.remote_addr, "WineBottle", bottle_key)
+
 
         json_response(self, {"success":True})
         

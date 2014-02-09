@@ -23,6 +23,8 @@ class BaseModel(ndb.Model):
                     value = datetime.strptime(data[field], '%Y/%m/%d')
                 elif fieldType == ndb.IntegerProperty:
                     value = int(data[field])
+                elif fieldType == ndb.BooleanProperty:
+                    value = bool(data[field])
                 else:
                     value = data[field]
                 setattr(self,field, value)

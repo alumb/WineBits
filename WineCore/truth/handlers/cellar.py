@@ -10,7 +10,7 @@ class CellarBaseHandler(webapp2.RequestHandler):
         cellar = WineCellar()
         try:
             key = cellar.create(post)
-            #Event.create(self.request.remote_addr, "WineCellar", key)
+            Event.create(self.request.remote_addr, "WineCellar", key)
         except ValueError as e:
             self.response.status = "400 Bad Request"
             self.response.write(str(e))
@@ -36,7 +36,7 @@ class CellarHandler(webapp2.RequestHandler):
         cellar_key = ndb.Key(WineCellar, int(cellar_id))
         cellar = cellar_key.get()
         cellar.modify(post)
-        #Event.create(self.request.remote_addr, "WineCellar", key)
+        Event.update(self.request.remote_addr, "WineCellar", cellar_key)
 
         json_response(self, cellar)
 
@@ -44,6 +44,7 @@ class CellarHandler(webapp2.RequestHandler):
         cellar_key = ndb.Key(WineCellar, int(cellar_id))
         cellar = cellar_key.get()
         cellar.delete()
+        Event.delete(self.request.remote_addr, "WineCellar", cellar_key)
         json_response(self, {"success":True})
 
 routes = [

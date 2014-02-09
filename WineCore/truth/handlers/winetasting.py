@@ -61,7 +61,7 @@ class WineTastingHandler(webapp2.RequestHandler):
         tasting_key = ndb.Key(Winery, int(winery_id), Wine, int(wine_id), UserWine, int(userwine_id), WineTasting, int(tasting_id))
         tasting = tasting_key.get()
         tasting.modify(post)
-        #Event.create(self.request.remote_addr, "WineTasting", key)
+        Event.update(self.request.remote_addr, "WineTasting", tasting_key)
 
         json_response(self, tasting)
 
@@ -69,6 +69,7 @@ class WineTastingHandler(webapp2.RequestHandler):
         tasting_key = ndb.Key(Winery, int(winery_id), Wine, int(wine_id), UserWine, int(userwine_id), WineTasting, int(tasting_id))
         tasting = tasting_key.get()
         tasting.delete()
+        Event.delete(self.request.remote_addr, "WineTasting", tasting_key)
         json_response(self, {"success":True})
 
 routes = [
