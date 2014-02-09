@@ -16,7 +16,8 @@ count = {
     'wine':15,
     'cellar':2,
     'winebottles':25,
-    'userwine':12
+    'userwine':12,
+    'tastings':20
 }
 
 cookie = 'dev_appserver_login="test@example.com:False:185804764220139124118"; Path=/'
@@ -38,8 +39,8 @@ def main():
     wines = loadWines(connection, wineries,count['wine'])
     cellar = loadCellar(connection, count['cellar'])
     loadWineBottle(connection,cellar, wines, count['winebottles'])
-    loadUserWines(connection, wines, count['userwine'])
-
+    userwines = loadUserWines(connection, wines, count['userwine'])
+    loadTastings(connection, userwines, count['tastings'])
 
 
 def get_random_name():
@@ -117,6 +118,17 @@ def create_random_userwine(connection, winery_id, wine_id):
     }
     return POST(connection, "/winery/%d/wine/%d/userwine" % (winery_id,wine_id), data)
 
+def create_random_tasting(connection, winery_id, wine_id, userwine_id):
+    data = {
+        'consumption_type': random.choice(['tasting','bottle']),
+        'consumption_location': random.choice(['home', 'winery', 'restaurant']),
+        'date': get_random_date(past=True),
+        'rating': random.randint(50,99),
+        'flawed': 'false',
+        'note':  random_name.adjective()
+    } 
+    return POST(connection, "/winery/%d/wine/%d/userwine/%d/tasting" % (winery_id,wine_id,userwine_id), data)
+
 def loadWineries(connection, count):
     wineries = GET(connection, "/winery")
     for i in range(len(wineries), count):
@@ -156,7 +168,11 @@ def loadWineBottle(connection, cellars, wines, count):
 def loadUserWines(connection, wines, count):
     existinguserwines = []
     for wine in wines:
-        existinguserwines.extend(GET(connection,"/winery/"+str(wine["winery_id"])+"/wine/" + str(wine["id"]) + "/userwine"))
+        new_userwines = GET(connection,"/winery/"+str(wine["winery_id"])+"/wine/" + str(wine["id"]) + "/userwine")
+        for new_userwine in new_userwines:
+            new_userwine["winery_id"] = wine["winery_id"]
+            new_userwine["wine_id"] = wine["id"]
+        existinguserwines.extend(new_userwines)
 
     availableWines = copy(wines)
     userwines = []
@@ -164,9 +180,24 @@ def loadUserWines(connection, wines, count):
     for i in range(len(existinguserwines),count):
         wine = random.choice(availableWines)
         availableWines.remove(wine)
-        userwines.append(create_random_userwine(connection, wine["winery_id"], wine["id"]))
+        new_userwine = create_random_userwine(connection, wine["winery_id"], wine["id"])
+        new_userwine["winery_id"] = wine["winery_id"]
+        new_userwine["wine_id"] = wine["id"]
+        userwines.append(new_userwine)
+
+    userwines.extend(existinguserwines)
 
     return userwines
+
+def loadTastings(connection, userwines, count):
+    tastings = []
+    for userwine in userwines:
+        tastings.extend(GET(connection,
+            "/winery/%d/wine/%d/userwine/%d/tasting" % (userwine["winery_id"], userwine["wine_id"], userwine["id"])))
+
+    for i in range(len(tastings),count):
+        userwine = random.choice(userwines)
+        tastings.append(create_random_tasting(connection, userwine["winery_id"], userwine["wine_id"], userwine["id"]))
 
 
 def GET(connection, url):

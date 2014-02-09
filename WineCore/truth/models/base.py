@@ -24,7 +24,7 @@ class BaseModel(ndb.Model):
                 elif fieldType == ndb.IntegerProperty:
                     value = int(data[field])
                 elif fieldType == ndb.BooleanProperty:
-                    value = bool(data[field])
+                    value = data[field].lower() == "true"
                 else:
                     value = data[field]
                 setattr(self,field, value)

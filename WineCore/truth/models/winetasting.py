@@ -1,7 +1,5 @@
 from truth.models.base import BaseModel
-from truth.constants import MAX_RESULTS
-from truth.stubs import ndb, search
-import json
+from truth.stubs import ndb
 
 class WineTasting(BaseModel):
     consumption_type = ndb.StringProperty()
