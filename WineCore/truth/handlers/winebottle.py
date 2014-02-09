@@ -5,7 +5,7 @@ from truth.constants import MAX_RESULTS
 from truth.models.wine import Wine
 from truth.models.winery import Winery
 from truth.models.cellar import WineCellar
-from truth.event import Event
+from truth.models.event import Event
 
 class WineBottleBaseHandler(webapp2.RequestHandler):
     def get(self, cellar_id):

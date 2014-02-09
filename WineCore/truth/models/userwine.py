@@ -1,6 +1,5 @@
 from truth.models.base import BaseModel
-from truth.constants import MAX_RESULTS
-from truth.stubs import ndb, search
+from truth.stubs import ndb
 import json
 
 class UserWine(BaseModel):
@@ -11,9 +10,9 @@ class UserWine(BaseModel):
 
     def config(self, data):
         self.apply(["drink_before","drink_after"],data)
-        if 'user_id' in data:
-            self['user'] = data['user_id']
-            del data['user_id']
+        if 'user' in data:
+            self.user = data['user']
+            del data['user']
 
         if 'tags' in data:
             tags = json.loads(data['tags'])

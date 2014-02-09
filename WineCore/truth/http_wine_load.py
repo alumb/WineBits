@@ -3,6 +3,8 @@ import urllib
 import json
 import random
 from datetime import date
+from copy import copy
+
 
 import random_name
 import wine_types
@@ -17,6 +19,7 @@ count = {
     'userwine':12
 }
 
+cookie = 'dev_appserver_login="test@example.com:False:185804764220139124118"; Path=/'
 
 def main():
     import sys
@@ -34,8 +37,8 @@ def main():
     wineries = loadWineries(connection, count['winery'])
     wines = loadWines(connection, wineries,count['wine'])
     cellar = loadCellar(connection, count['cellar'])
-    loadWineBottle(connection,cellar,wines,count['winebottles'])
-    #loadUserWines(connection, wines,count['userwine'])
+    loadWineBottle(connection,cellar, wines, count['winebottles'])
+    loadUserWines(connection, wines, count['userwine'])
 
 
 
@@ -69,7 +72,6 @@ def create_random_winery(connection):
         }
     return POST(connection, "/winery", data)
 
-
 def create_random_wine(connection, winery_id):
     data = {
         'name':get_random_name(), 
@@ -80,15 +82,6 @@ def create_random_wine(connection, winery_id):
     wine = POST(connection, "/winery/%d/wine" % winery_id, data)
     wine['winery_id'] = winery_id
     return wine
-
-
-def create_random_userwine(connection, winery_id, wine_id):
-    data = {
-        'drink_after':get_random_date(past=False),
-        'drink_before':get_random_date(past=False),
-        'tags':json.dumps([random_name.adjective() for x in range(0,4)])
-    }
-    return POST(connection, "/winery/%d/wine/%d/userwine" % (winery_id,wine_id), data)
 
 def create_random_cellar(connection):
     data = {
@@ -116,13 +109,21 @@ def create_random_winebottle(connection, cellar_id, winery_id, wine_id):
     winebottle['cellar_id'] = cellar_id
     return winebottle
 
-def loadWineries(connection,count):
+def create_random_userwine(connection, winery_id, wine_id):
+    data = {
+        'drink_after':get_random_date(past=False),
+        'drink_before':get_random_date(past=False),
+        'tags':json.dumps([random_name.adjective() for x in range(0,4)])
+    }
+    return POST(connection, "/winery/%d/wine/%d/userwine" % (winery_id,wine_id), data)
+
+def loadWineries(connection, count):
     wineries = GET(connection, "/winery")
     for i in range(len(wineries), count):
         wineries.append(create_random_winery(connection))
     return wineries
 
-def loadWines(connection,wineries,count):
+def loadWines(connection, wineries, count):
     wines = []
     for winery in wineries:
         wineryWines = GET(connection,"/winery/"+str(winery["id"])+"/wine")
@@ -135,13 +136,13 @@ def loadWines(connection,wineries,count):
 
     return wines
 
-def loadCellar(connection,count):
+def loadCellar(connection, count):
     cellar = GET(connection, "/cellar")
     for i in range(len(cellar), count):
         cellar.append(create_random_cellar(connection))
     return cellar
 
-def loadWineBottle(connection,cellars,wines,count):
+def loadWineBottle(connection, cellars, wines, count):
     winebottles = []
     for cellar in cellars:
         winebottles.extend(GET(connection,"/cellar/"+str(cellar["id"])+"/wine"))
@@ -152,10 +153,26 @@ def loadWineBottle(connection,cellars,wines,count):
 
     return winebottles
 
+def loadUserWines(connection, wines, count):
+    existinguserwines = []
+    for wine in wines:
+        existinguserwines.extend(GET(connection,"/winery/"+str(wine["winery_id"])+"/wine/" + str(wine["id"]) + "/userwine"))
+
+    availableWines = copy(wines)
+    userwines = []
+
+    for i in range(len(existinguserwines),count):
+        wine = random.choice(availableWines)
+        availableWines.remove(wine)
+        userwines.append(create_random_userwine(connection, wine["winery_id"], wine["id"]))
+
+    return userwines
+
+
 def GET(connection, url):
     url = prelude+url
     print "Get: ", url 
-    connection.request("GET", url)
+    connection.request("GET", url, None, {"Cookie":cookie})
     response = connection.getresponse()
     print "\t", response.status
     resp = response.read()
@@ -167,7 +184,7 @@ def POST(connection, url, params={}):
     url = prelude+url
     print "POST: ", url 
     params = urllib.urlencode(params)
-    connection.request("POST", url, params)
+    connection.request("POST", url, params, {"Cookie":cookie})
     response = connection.getresponse()
     print "\t", response.status
     resp = response.read()

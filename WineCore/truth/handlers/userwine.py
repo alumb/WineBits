@@ -5,9 +5,25 @@ from truth.models.event import Event
 from truth.models.winery import Winery
 from truth.models.wine import Wine
 from truth.models.userwine import UserWine
+from truth.constants import MAX_RESULTS
 
 
 class UserWineBaseHandler(webapp2.RequestHandler):
+    def get(self, winery_id, wine_id):
+
+        wine_key = ndb.Key(Winery, int(winery_id), Wine, int(wine_id))
+        wine = wine_key.get()
+
+        if not wine:
+            self.response.write("404 Not Found")
+            self.response.status = "404 Not Found"
+            return
+
+        qry = UserWine.query(ancestor=wine_key)
+        results = qry.fetch(MAX_RESULTS)
+
+        json_response(self, [x for x in results])
+
     def post(self,winery_id,wine_id):
         wine_key = ndb.Key(Winery, int(winery_id), Wine, int(wine_id))
 
@@ -16,8 +32,8 @@ class UserWineBaseHandler(webapp2.RequestHandler):
         userwine = UserWine(parent=wine_key)
 
         try:
+            post['user'] = users.get_current_user()
             key = userwine.create(post)
-            userwine.user = users.get_current_user()
             Event.create(self.request.remote_addr, "UserWine", key)
         except ValueError as e:
             self.response.status = "400 Bad Request"
@@ -44,7 +60,7 @@ class UserWineHandler(webapp2.RequestHandler):
         userwine_key = ndb.Key(Winery, int(winery_id), Wine, int(wine_id), UserWine, int(userwine_id))
         userwine = userwine_key.get()
         userwine.modify(post)
-        Event.update(self.request.remote_addr, "UserWine", key)
+        Event.update(self.request.remote_addr, "UserWine", userwine_key)
 
         json_response(self, userwine)
 
