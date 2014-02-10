@@ -6,11 +6,7 @@ test:
 
 random_wine:
 	echo "Make sure to turn on the server first!" 
-	python http_wine_load.py http://localhost:8080 random
-
-sample_wine:
-	echo "Make sure to turn on the server first!"
-	python http_wine_load.py http://localhost:8080 data/wine_sample.json 
+	python http_wine_load.py http://localhost:8081
 
 lint:
 	pep8

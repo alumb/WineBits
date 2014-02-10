@@ -1,13 +1,12 @@
-from truth.stubs import debug, webapp2, ndb
+from truth.stubs import webapp2, ndb
 from truth.views.jsonview import json_response 
 from truth.models.winebottle import WineBottle
 from truth.constants import MAX_RESULTS
-from google.appengine.api import users
 from truth.models.wine import Wine
 from truth.models.winery import Winery
 from truth.models.cellar import WineCellar
-
-import json
+from truth.models.event import Event
+from truth.models.user import User
 
 class WineBottleBaseHandler(webapp2.RequestHandler):
     def get(self, cellar_id):
@@ -17,6 +16,11 @@ class WineBottleBaseHandler(webapp2.RequestHandler):
         if not cellar:
             self.response.write("404 Not Found")
             self.response.status = "404 Not Found"
+            return
+
+        if not User.hasAccess(cellar_key):
+            self.response.write("403 Forbidden")
+            self.response.status = "403 Forbidden"            
             return
 
         qry = WineBottle.query(ancestor=cellar.key)        
@@ -34,6 +38,11 @@ class WineBottleBaseHandler(webapp2.RequestHandler):
             self.response.status = "404 Not Found"
             return
 
+        if not User.hasAccess(cellar_key):
+            self.response.write("403 Forbidden")
+            self.response.status = "403 Forbidden"            
+            return
+
         post = self.request.POST
 
         if 'wine_id' in post and 'winery_id' in post:
@@ -48,6 +57,8 @@ class WineBottleBaseHandler(webapp2.RequestHandler):
             bottle.wine = wine.key
 
             key = bottle.create(post)
+            
+            Event.create(self.request.remote_addr, "WineBottle", key)
 
             self.response.content_type="application/json"
             json_response(self, bottle)
@@ -66,6 +77,11 @@ class WineBottleHandler(webapp2.RequestHandler):
             self.response.status = "404 Not Found"
             return
 
+        if not User.hasAccess(ndb.Key(WineCellar, int(cellar_id))):
+            self.response.write("403 Forbidden")
+            self.response.status = "403 Forbidden"            
+            return
+
         json_response(self, bottle)
 
     def post(self,cellar_id,winebottle_id):
@@ -75,6 +91,11 @@ class WineBottleHandler(webapp2.RequestHandler):
         if not bottle:
             self.response.write("404 Not Found")
             self.response.status = "404 Not Found"
+            return
+
+        if not User.hasAccess(ndb.Key(WineCellar, int(cellar_id))):
+            self.response.write("403 Forbidden")
+            self.response.status = "403 Forbidden"            
             return
 
         post = self.request.POST
@@ -91,6 +112,8 @@ class WineBottleHandler(webapp2.RequestHandler):
 
             key = bottle.modify(post)
 
+            Event.update(self.request.remote_addr, "WineBottle", key)           
+
             self.response.content_type="application/json"
             json_response(self, bottle)
 
@@ -106,8 +129,16 @@ class WineBottleHandler(webapp2.RequestHandler):
             self.response.write("404 Not Found")
             self.response.status = "404 Not Found"
             return
-        
+
+        if not User.hasAccess(ndb.Key(WineCellar, int(cellar_id))):
+            self.response.write("403 Forbidden")
+            self.response.status = "403 Forbidden"            
+            return
+                    
         bottle.delete()
+
+        Event.create(self.request.remote_addr, "WineBottle", bottle_key)
+
 
         json_response(self, {"success":True})
         

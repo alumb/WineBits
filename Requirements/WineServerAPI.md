@@ -147,7 +147,7 @@ Parent: UserWine
 - id: 1234567890123456
 - consumption_type: 'tasting' //from:['fromMyCellar','tasting',...]
 - consumption_location: 'winery' //from: ['home', 'winery', 'restaurant']
-- consumption_locationName: null //name if at restaurant
+- consumption_location_name: null //name if at restaurant
 - date: 2013/8/25
 - rating: 92
 - flawed: false

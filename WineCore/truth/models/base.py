@@ -21,6 +21,10 @@ class BaseModel(ndb.Model):
                 fieldType = type(getattr(type(self),field))
                 if fieldType == ndb.DateProperty:
                     value = datetime.strptime(data[field], '%Y/%m/%d')
+                elif fieldType == ndb.IntegerProperty:
+                    value = int(data[field])
+                elif fieldType == ndb.BooleanProperty:
+                    value = data[field].lower() == "true"
                 else:
                     value = data[field]
                 setattr(self,field, value)

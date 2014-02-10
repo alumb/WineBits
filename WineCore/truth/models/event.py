@@ -1,8 +1,7 @@
 from truth.models.base import BaseModel
-from truth.stubs import ndb, uuid, search
+from truth.stubs import ndb
 
 actions = ["CREATE", "UPDATE"]
-models = ["Winery", "Wine"]
 
 class Event(BaseModel):
     """
@@ -11,24 +10,27 @@ class Event(BaseModel):
     user = ndb.StringProperty(required=True, indexed=False)
     action = ndb.StringProperty(required=True, choices=actions)
     model = ndb.KeyProperty(required=True)
-    model_type = ndb.StringProperty(required=True, choices=models)
+    model_type = ndb.StringProperty(required=True)
     time = ndb.DateTimeProperty(auto_now_add=True)
 
     @staticmethod
-    def create(user, model_type, model):
+    def addEvent(event, user, model_type, model):
         e = Event()
-        e.action = "CREATE"
+        e.action = event
         e.user = user
         e.model = model
         e.model_type = model_type
         return e.put()
 
     @staticmethod
+    def create(user, model_type, model):
+        Event.addEvent("CREATE", user, model_type, model)
+ 
+    @staticmethod
     def update(user, model_type, model):
-        e = Event()
-        e.action = "UPDATE"
-        e.user = user
-        e.model = model
-        e.model_type = model_type
-        return e.put()
+        Event.addEvent("UPDATE", user, model_type, model)
+
+    @staticmethod
+    def delete(user, model_type, model):
+        Event.addEvent("DELETE", user, model_type, model)
 
