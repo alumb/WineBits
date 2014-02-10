@@ -3,7 +3,7 @@ from truth.stubs import ndb
 import json
 
 class UserWine(BaseModel):
-    user = ndb.UserProperty()
+    user = ndb.KeyProperty()
     drink_after = ndb.DateProperty()
     drink_before = ndb.DateProperty()
     tags = ndb.StringProperty(repeated=True) # list of tags
@@ -11,7 +11,7 @@ class UserWine(BaseModel):
     def config(self, data):
         self.apply(["drink_before","drink_after"],data)
         if 'user' in data:
-            self.user = data['user']
+            self.user = data['user'].key
             del data['user']
 
         if 'tags' in data:
