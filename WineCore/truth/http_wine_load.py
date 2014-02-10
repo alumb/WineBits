@@ -4,6 +4,7 @@ import json
 import random
 from datetime import date
 from copy import copy
+import time
 
 
 import random_name
@@ -170,6 +171,8 @@ def loadCellar(connection, count):
             cellars.append(cellar)
         else:
             availableUsers.append(user)
+
+    time.sleep(2) # neccisary so that the cache updates and we don't create duplicate users
 
     for i in range(len(cellars), count):
         user = random.choice(availableUsers)
