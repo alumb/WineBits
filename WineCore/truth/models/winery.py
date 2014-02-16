@@ -5,6 +5,7 @@ from truth.models.base import BaseModel, YouNeedATokenForThat
 from truth.stubs import ndb, uuid, search
 from truth.constants import MAX_RESULTS
 
+
 class Winery(BaseModel):
     """
     Represents a single wine producer.
@@ -16,11 +17,11 @@ class Winery(BaseModel):
 
     @property
     def has_location(self):
-        return self.has_key('location')
+        return 'location' in self
 
     @property
     def has_location_fuzzy(self):
-        return self.has_key('location_fuzzy')
+        return 'location_fuzzy' in self
 
     # these fields are calculated from location
     # and can't be set from the web interface
@@ -30,15 +31,15 @@ class Winery(BaseModel):
 
     @property
     def has_country(self):
-        return self.has_key('country')
+        return 'country' in self
 
     @property
     def has_region(self):
-        return self.has_key('region')
+        return 'region' in self
 
     @property
     def has_subregion(self):
-        return self.has_key('subregion')
+        return 'subregion' in self
 
     #security stuff
     verified = ndb.BooleanProperty(default=False)
@@ -49,17 +50,17 @@ class Winery(BaseModel):
 
     @property
     def has_verified(self):
-        return self.has_key('verified')
+        return 'verified' in self
 
     @property
     def has_verified_by(self):
-        return self.has_key('verified_by')
+        return 'verified_by' in self
 
     json = ndb.JsonProperty(indexed=False)
 
     @property
     def has_json(self):
-        return self.has_key('json')
+        return 'json' in self
     # website, phone_number
 
     def create(self, post):
@@ -207,7 +208,7 @@ class Winery(BaseModel):
 
         def field_edit_error(fieldname):
             return YouNeedATokenForThat(("You can't edit fields that already" +
-                                          " exist: %s" % fieldname))
+                                         " exist: %s" % fieldname))
         can_edit_fields = False
         if 'token' in post:
             can_edit_fields = self.verify(post['token'])
@@ -222,7 +223,7 @@ class Winery(BaseModel):
 
         # if new location == old location, fugeddaboutit
         if ('location' in post and self.has_location and
-            post['location'] == self.to_dict()['location'] ):
+                post['location'] == self.to_dict()['location']):
             del post['location']
 
         if 'location' in post:
@@ -295,12 +296,12 @@ class Winery(BaseModel):
 
     def update(self, wines=[]):
         """
-        Recalculate this object's rank, 
+        Recalculate this object's rank,
         and
-        create a search index for it. 
+        create a search index for it.
         """
         if not self.key:
-            raise ArgumentException("Can't update without a key.")
+            raise Exception("Can't update without a key.")
 
         index = search.Index(name="wineries")
         
@@ -319,11 +320,11 @@ class Winery(BaseModel):
         name = self.to_dict()['name']
         partial_name = BaseModel.partial_search_string(name)
         fields.append(search.TextField(name='name', value=name))
-        fields.append(search.TextField(name='partial_name', 
+        fields.append(search.TextField(name='partial_name',
                                        value=partial_name))
 
         fields.append(search.TextField(name='location', value=location))
-        fields.append(search.TextField(name='partial_location', 
+        fields.append(search.TextField(name='partial_location',
                                        value=partial_location))
         
         if self.has_country:
@@ -338,18 +339,18 @@ class Winery(BaseModel):
             subregion = self.to_dict()['subregion']
             fields.append(search.AtomField(name='subregion', value=subregion))
 
-        fields.append(search.AtomField(name='verified', 
+        fields.append(search.AtomField(name='verified',
                                        value=str(self.has_verified)))
 
-        fields.append(search.NumberField(name='rank', 
+        fields.append(search.NumberField(name='rank',
                                          value=self.rank))
         
-        fields.append(search.TextField(name='id', 
+        fields.append(search.TextField(name='id',
                                        value=str(self.key.id())))
 
-        searchdoc = search.Document(doc_id = searchkey,
+        searchdoc = search.Document(doc_id=searchkey,
                                     fields=fields,
-                                    rank=self.rank) 
+                                    rank=self.rank)
         
         index.put(searchdoc)
         return None
@@ -433,33 +434,32 @@ class Winery(BaseModel):
             if subregion:
                 self.subregion = subregion
 
-
     @staticmethod
     def all_query():
         qry = Winery.query()
         results = qry.fetch(MAX_RESULTS, projection=[Winery.name,
-                                            Winery.verified, Winery.location])
+                            Winery.verified, Winery.location])
         return [x for x in results]
 
     @staticmethod
     def country_query(country):
         qry = Winery.query(Winery.country == country)
         results = qry.fetch(MAX_RESULTS, projection=[Winery.name,
-                                            Winery.verified, Winery.location])
+                            Winery.verified, Winery.location])
         return [x for x in results]
 
     @staticmethod
     def region_query(region):
         qry = Winery.query(Winery.region == region)
         results = qry.fetch(MAX_RESULTS, projection=[Winery.name,
-                                            Winery.verified, Winery.location])
+                            Winery.verified, Winery.location])
         return [x for x in results]
 
     @staticmethod
     def subregion_query(subregion):
         qry = Winery.query(Winery.subregion == subregion)
         results = qry.fetch(MAX_RESULTS, projection=[Winery.name,
-                                            Winery.verified, Winery.location])
+                            Winery.verified, Winery.location])
         return [x for x in results]
 
     @staticmethod
@@ -499,6 +499,6 @@ class Winery(BaseModel):
 
     @staticmethod
     def all_fuzzy_locations():
-        qry = Winery.query(Winery.location_fuzzy != None)
+        qry = Winery.query(Winery.location_fuzzy is not None)
         results = qry.fetch(MAX_RESULTS)
         return [x.location_fuzzy for x in results]

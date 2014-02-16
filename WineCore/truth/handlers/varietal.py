@@ -1,6 +1,7 @@
-from truth.stubs import webapp2 
-from truth.views.jsonview import json_response 
+from truth.stubs import webapp2
+from truth.views.jsonview import json_response
 from truth import wine_types
+
 
 class VarietalHandler(webapp2.RequestHandler):
     """
@@ -12,6 +13,5 @@ class VarietalHandler(webapp2.RequestHandler):
         json_response(self, response)
 
 routes = [
-            (r'/varietal/?', VarietalHandler),
-
-        ]
+    (r'/varietal/?', VarietalHandler),
+]

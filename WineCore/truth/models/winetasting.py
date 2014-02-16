@@ -1,6 +1,7 @@
 from truth.models.base import BaseModel
 from truth.stubs import ndb
 
+
 class WineTasting(BaseModel):
     consumption_type = ndb.StringProperty()
     consumption_location = ndb.StringProperty()
@@ -11,8 +12,8 @@ class WineTasting(BaseModel):
     note = ndb.StringProperty()
 
     def config(self, data):
-        self.apply(["consumption_type","consumption_location","consumption_location_name", 
-            "date","rating","flawed","note"],data)
+        self.apply(["consumption_type", "consumption_location", "consumption_location_name",
+                    "date", "rating", "flawed", "note"], data)
 
     def create(self, data):
         self.config(data)
@@ -26,5 +27,3 @@ class WineTasting(BaseModel):
 
     def delete(self):
         self.key.delete()
-
-

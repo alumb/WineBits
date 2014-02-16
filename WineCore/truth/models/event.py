@@ -3,6 +3,7 @@ from truth.stubs import ndb
 
 actions = ["CREATE", "UPDATE"]
 
+
 class Event(BaseModel):
     """
     User <X> has created model <Key> at time <Z>
@@ -14,7 +15,7 @@ class Event(BaseModel):
     time = ndb.DateTimeProperty(auto_now_add=True)
 
     @staticmethod
-    def addEvent(event, user, model_type, model):
+    def add_event(event, user, model_type, model):
         e = Event()
         e.action = event
         e.user = user
@@ -24,13 +25,12 @@ class Event(BaseModel):
 
     @staticmethod
     def create(user, model_type, model):
-        Event.addEvent("CREATE", user, model_type, model)
+        Event.add_event("CREATE", user, model_type, model)
  
     @staticmethod
     def update(user, model_type, model):
-        Event.addEvent("UPDATE", user, model_type, model)
+        Event.add_event("UPDATE", user, model_type, model)
 
     @staticmethod
     def delete(user, model_type, model):
-        Event.addEvent("DELETE", user, model_type, model)
-
+        Event.add_event("DELETE", user, model_type, model)

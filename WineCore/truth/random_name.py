@@ -266,16 +266,20 @@ years = [
     2015
 ]
 
+
 def adjective():
     return random.choice(adjectives)
+
 
 def noun():
     return random.choice(nouns)
 
+
 def year():
     return random.choice(years)
 
+
 def name():
-    adj = "-".join([ adjective() for x in range(0,2)])
-    noun_ = "".join([ noun() for x in range(0,2)])
+    adj = "-".join([adjective() for x in range(0, 2)])
+    noun_ = "".join([noun() for x in range(0, 2)])
     return adj + "-" + noun_

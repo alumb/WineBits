@@ -1,11 +1,10 @@
 from truth.models.wine import Wine
 from truth.models.winery import Winery
 from truth.stubs import debug, ndb
-from datetime import datetime, date
+from datetime import date
 from google.appengine.api import users
 import json
 
-import logging
 
 def get_url(model):
     """
@@ -28,21 +27,7 @@ def get_url(model):
 
 
 def model_to_json(model, extended_listing=False):
-    """
-    Converts Models into dicts
-    >>> v = Winery()
-    >>> key = v.create({'name':'Winery'})
-    >>> MyHandler.json(v)
-    {...'name': 'Winery'...}
 
-    Adds Model links
-    >>> MyHandler.json(v)
-    {...'url': '/winery/stub-key'...}
-
-    Flattens json elements
-    >>> MyHandler.json({'json':{'thing':'awesome'}})
-    {...'thing': 'awesome'...}
-    """
     try:
         url = get_url(model)
         try:
@@ -65,7 +50,7 @@ def model_to_json(model, extended_listing=False):
             if issubclass(type(value), ndb.Key):
                 if extended_listing:
                     object_[key] = model_to_json(value.get(), extended_listing)
-                else :
+                else:
                     object_[key] = value.id()
             if issubclass(type(value), date):
                 object_[key] = value.strftime("%Y/%m/%d")
@@ -76,13 +61,12 @@ def model_to_json(model, extended_listing=False):
         
         if extended_listing:
             parent = model.key.parent()
-            while parent != None:
+            while parent is not None:
                 object_[parent.kind()] = model_to_json(parent.get(), extended_listing)
                 parent = parent.parent()
 
-
         return object_
-    except AttributeError as e:
+    except AttributeError:
         return model
 
 
@@ -97,9 +81,8 @@ def json_response(handler, model, extended_listing=False):
     else:
         object_ = [model_to_json(o, extended_listing) for o in model]
 
-    handler.response.content_type="application/json"
+    handler.response.content_type = "application/json"
     if debug:
-        handler.response.write( json.dumps(object_, indent=2 ))
+        handler.response.write(json.dumps(object_, indent=2))
     else:
-        handler.response.write( json.dumps(object_) )
-
+        handler.response.write(json.dumps(object_))

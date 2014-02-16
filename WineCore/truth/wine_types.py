@@ -53,7 +53,7 @@ fruits = [
     u'Peach',
     u'Pear',
     u'Pineapple',
-    u'Potato', #isn't that just vodka?
+    u'Potato',  # isn't that just vodka?
     u'Plum',
     u'Purple Mangosteen',
     u'Raspberry',

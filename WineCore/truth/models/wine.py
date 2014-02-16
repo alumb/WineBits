@@ -4,6 +4,7 @@ from truth.models.winery import Winery
 from truth.constants import MAX_RESULTS
 from truth.stubs import ndb, search
 
+
 class Wine(BaseModel):
     # Parent: Winery
     year = ndb.IntegerProperty()
@@ -14,34 +15,34 @@ class Wine(BaseModel):
 
     @property
     def has_year(self):
-        return self.has_key('year')
+        return 'year' in self
 
     @property
     def has_name(self):
-        return self.has_key('name')
+        return 'name' in self
 
     @property
     def has_winetype(self):
-        return self.has_key('winetype')
+        return 'winetype' in self
 
     @property
     def has_varietal(self):
-        return self.has_key('varietal')
+        return 'varietal' in self
 
     @property
     def has_upc(self):
-        return self.has_key('upc')
+        return 'upc' in self
 
     verified = ndb.BooleanProperty(default=False)
     verified_by = ndb.StringProperty()
     
     @property
     def has_verified(self):
-        return self.has_key('verified')
+        return 'verified' in self
 
     @property
     def has_verified_by(self):
-        return self.has_key('verified_by')
+        return 'verified_by' in self
 
     json = ndb.JsonProperty(indexed=False)
     # JSON properties encompass the bits that might want to be tracked
@@ -50,7 +51,7 @@ class Wine(BaseModel):
     # bottling_date, alcohol_content, winemaker_notes, vineyard_notes...
 
     def has_json(self):
-        return self.has_key('json')
+        return 'json' in self
 
     def create(self, post, winery):
         """
@@ -117,7 +118,7 @@ class Wine(BaseModel):
             raise ValueError("You must provide a winetype")
 
         if not name and not year and not varietal and not upc:
-            raise ValueError("You must provide a name, year, "+
+            raise ValueError("You must provide a name, year, " +
                              " varietal, or upc.")
 
         token = None
@@ -186,7 +187,7 @@ class Wine(BaseModel):
         """
         def field_edit_error(fieldname):
             return YouNeedATokenForThat(("You can't edit fields that already" +
-                                          " exist: %s" % fieldname))
+                                         " exist: %s" % fieldname))
 
         can_edit_fields = False
         if 'token' in post:
@@ -196,7 +197,7 @@ class Wine(BaseModel):
 
         def can_edit_field(field_name):
             if field_name in post:
-                if not self.has_key(field_name):
+                if not field_name in self:
                     return True
                 if post[field_name] == str(self.to_dict()[field_name]):
                     return True
@@ -304,7 +305,7 @@ class Wine(BaseModel):
         winery.put()
 
         # recreate search indexes for every wine under the winery
-        #   with the new winery rank as their search index. 
+        #   with the new winery rank as their search index.
         for wine in wines:
             wine.create_search_index(winery)
 
@@ -313,7 +314,7 @@ class Wine(BaseModel):
         create a search index for this wine
         """
         if not self.key:
-            raise ArgumentException("Can't update without a key.")
+            raise Exception("Can't update without a key.")
         
         index = search.Index(name="wines")
         
@@ -331,13 +332,13 @@ class Wine(BaseModel):
             name = self.to_dict()['name']
             partial_name = BaseModel.partial_search_string(name)
             fields.append(search.TextField(name='name', value=name))
-            fields.append(search.TextField(name='partial_name', 
+            fields.append(search.TextField(name='partial_name',
                                            value=partial_name))
 
         winery_name = winery.to_dict()['name']
         partial_winery_name = BaseModel.partial_search_string(winery_name)
         fields.append(search.TextField(name='winery', value=winery_name))
-        fields.append(search.TextField(name='partial_winery', 
+        fields.append(search.TextField(name='partial_winery',
                                        value=partial_winery_name))
         
         if self.has_winetype:
@@ -348,27 +349,27 @@ class Wine(BaseModel):
             varietal = self.to_dict()['varietal']
             partial_varietal = BaseModel.partial_search_string(varietal)
             fields.append(search.TextField(name='varietal', value=varietal))
-            fields.append(search.TextField(name='partial_varietal', 
+            fields.append(search.TextField(name='partial_varietal',
                                            value=partial_varietal))
         
         if self.has_upc:
             upc = self.to_dict()['upc']
             fields.append(search.TextField(name='upc', value=upc))
         
-        fields.append(search.AtomField(name='verified', 
+        fields.append(search.AtomField(name='verified',
                                        value=str(self.has_verified)))
         
-        fields.append(search.TextField(name='id', 
+        fields.append(search.TextField(name='id',
                                        value=str(self.key.id())))
         fields.append(search.TextField(name='winery_id',
                                        value=str(winery.key.id())))
         
-        fields.append(search.NumberField(name='rank', 
+        fields.append(search.NumberField(name='rank',
                                          value=rank))
         
-        searchdoc = search.Document(doc_id = searchkey, 
-                                    fields=fields, 
-                                    rank=rank) 
+        searchdoc = search.Document(doc_id=searchkey,
+                                    fields=fields,
+                                    rank=rank)
         
         index.put(searchdoc)
         return None

@@ -1,5 +1,6 @@
 from truth.stubs import ndb
 
+
 class Place(ndb.Model):
     # Parent: Winery
     address = ndb.TextProperty(indexed=False)

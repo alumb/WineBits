@@ -1,5 +1,6 @@
 from truth.stubs import webapp2, search
-from truth.views.jsonview import json_response 
+from truth.views.jsonview import json_response
+
 
 class SearchHandler(webapp2.RequestHandler):
     """
@@ -17,8 +18,8 @@ class SearchHandler(webapp2.RequestHandler):
         
         wine_limiter = search.QueryOptions(
             returned_fields=['year', 'name', 'varietal', 'winery', 'varietal',
-                            'winetype', 
-                             'upc', 'verified', 'id', 'winery_id', 'rank']) 
+                             'winetype',
+                             'upc', 'verified', 'id', 'winery_id', 'rank'])
         winery_limiter = search.QueryOptions(
             returned_fields=['name', 'location', 'verified', 'id', 'rank'])
 
@@ -40,21 +41,19 @@ class SearchHandler(webapp2.RequestHandler):
         
         def with_url(dict_):
             if 'id' in dict_ and not 'winery_id' in dict_:
-                dict_['url'] = "/winery/"+str(dict_['id'])
+                dict_['url'] = "/winery/" + str(dict_['id'])
             elif 'id' in dict_ and 'winery_id' in dict_:
-                dict_['url'] = ( "/winery/"+str(dict_['winery_id']) +
-                                 "/wine/"+str(dict_['id']) )
+                dict_['url'] = ("/winery/" + str(dict_['winery_id']) +
+                                "/wine/" + str(dict_['id']))
             return dict_
 
-
         wines = [with_url(to_dict(wine)) for wine in wine_results.results]
-        wineries = [with_url(to_dict(winery)) for winery 
-                                                in winery_results.results]
+        wineries = [with_url(to_dict(winery)) for winery in winery_results.results]
 
-        response = {'wines':wines, 'wineries':wineries }
+        response = {'wines': wines, 'wineries': wineries}
         
         json_response(self, response)
 
 routes = [
     (r'/search', SearchHandler),
-    ]
+]

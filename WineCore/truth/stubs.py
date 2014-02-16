@@ -33,32 +33,42 @@ else:
                 if 'parent' in kwargs:
                     self.parent = kwargs['parent']
                 pass
+
             def put(self, *args, **kwargs):
                 self.key = ndb.Key("stub-key")
                 if self.parent:
                     ndb.Key.load_parent(self.parent)
                 return ndb.Key("stub-key")
+
             def to_dict(self, *args, **kwargs):
                 return vars(self)
+            
             @classmethod
             def query(cls, *args, **kwargs):
                 return ndb.QueryResult(args, kwargs)
             pass
+
         class Key(object):
             thing_to_get = None
             parent_ = None
+            
             def __init__(self, *args):
                 self._id = "-".join([str(x) for x in args])
                 pass
+            
             def id(self):
                 return self._id
+            
             def get(self, *args, **kwargs):
                 return ndb.Key.thing_to_get
+            
             def parent(self, *args, **kwargs):
                 return self.parent_
+            
             @classmethod
             def load_get(cls, thing):
                 cls.thing_to_get = thing
+            
             @classmethod
             def load_parent(cls, parent):
                 cls.parent_ = parent
@@ -66,6 +76,7 @@ else:
         class QueryResult:
             def __init__(self, *args, **kwargs):
                 pass
+            
             def fetch(self, *args, **kwargs):
                 return []
 
@@ -171,16 +182,19 @@ else:
         def __init__(self, *args, **kwargs):
             self.content_type = None
             self.last_write = None
+        
         def write(self, thing):
             self.last_write = thing
 
     class webapp2(object):
         def __init__(self, *args, **kwargs):
             pass
+        
         class RequestHandler(object):
             def __init__(self, *args, **kwargs):
                 self.request = FakeRequest()
                 self.response = FakeResponse()
+        
         class WSGIApplication(object):
             def __init__(self, *args, **kwargs):
                 pass
@@ -191,10 +205,12 @@ else:
     class uuid(object):
         def __init__(self, *args, **kwargs):
             pass
+        
         class UUID(object):
             def __init__(self, *args, **kwargs):
                 pass
             hex = "stub-uuid"
+        
         @staticmethod
         def uuid4(*args, **kwargs):
             return uuid.UUID()
@@ -206,20 +222,26 @@ else:
         class Document(object):
             def __init__(self, *args, **kwargs):
                 pass
+        
         class Index(object):
             def __init__(self, *args, **kwargs):
                 pass
+            
             def put(self, *args, **kwargs):
                 pass
+       
         class Error(Exception):
             def __init__(self, *args, **kwargs):
                 pass
+        
         class TextField(object):
             def __init__(self, *args, **kwargs):
                 pass
+        
         class NumberField(object):
             def __init__(self, *args, **kwargs):
                 pass
+        
         class AtomField(object):
             def __init__(self, *args, **kwargs):
                 pass

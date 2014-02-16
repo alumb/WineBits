@@ -1,5 +1,5 @@
 from truth.stubs import webapp2, ndb
-from truth.views.jsonview import json_response 
+from truth.views.jsonview import json_response
 from truth.models.event import Event
 from truth.models.winery import Winery
 from truth.models.wine import Wine
@@ -24,7 +24,7 @@ class UserWineBaseHandler(webapp2.RequestHandler):
 
         json_response(self, [x for x in results])
 
-    def post(self,winery_id,wine_id):
+    def post(self, winery_id, wine_id):
         wine_key = ndb.Key(Winery, int(winery_id), Wine, int(wine_id))
 
         post = self.request.POST
@@ -42,6 +42,7 @@ class UserWineBaseHandler(webapp2.RequestHandler):
 
         json_response(self, userwine)
 
+
 class UserWineHandler(webapp2.RequestHandler):
     def get(self, winery_id, wine_id, userwine_id):
 
@@ -54,7 +55,7 @@ class UserWineHandler(webapp2.RequestHandler):
 
         if userwine.user != User.get_current_user().key:
             self.response.write("403 Forbidden")
-            self.response.status = "403 Forbidden"            
+            self.response.status = "403 Forbidden"
             return
 
         json_response(self, userwine)
@@ -71,7 +72,7 @@ class UserWineHandler(webapp2.RequestHandler):
 
         if userwine.user != User.get_current_user().key:
             self.response.write("403 Forbidden")
-            self.response.status = "403 Forbidden"            
+            self.response.status = "403 Forbidden"
             return
 
         userwine.modify(post)
@@ -89,11 +90,11 @@ class UserWineHandler(webapp2.RequestHandler):
 
         if userwine.user != User.get_current_user().key:
             self.response.write("403 Forbidden")
-            self.response.status = "403 Forbidden"            
+            self.response.status = "403 Forbidden"
             return
 
         userwine.delete()
-        json_response(self, {"success":True})
+        json_response(self, {"success": True})
 
 routes = [
     (r'/winery/(\d+)/wine/(\d+)/userwine/?', UserWineBaseHandler),

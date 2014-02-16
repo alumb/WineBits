@@ -1,9 +1,10 @@
 from truth.models.base import YouNeedATokenForThat
 from truth.stubs import webapp2, ndb
-from truth.views.jsonview import json_response 
+from truth.views.jsonview import json_response
 from truth.models.wine import Wine
 from truth.models.winery import Winery
 from truth.models.event import Event
+
 
 class WineryBaseHandler(webapp2.RequestHandler):
     """
@@ -39,11 +40,11 @@ class WineryBaseHandler(webapp2.RequestHandler):
             return
         if 'location_fuzzy' in get:
             json_response(self, Winery.location_fuzzy_query(
-                               get['location_fuzzy']))
+                          get['location_fuzzy']))
             return
         if 'verified_by' in get:
             json_response(self, Winery.verified_by_query(
-                               get['verified_by']))
+                          get['verified_by']))
             return
         if 'verified' in get:
             verified = False
@@ -149,4 +150,4 @@ class WineryHandler(webapp2.RequestHandler):
 routes = [
     (r'/winery/?', WineryBaseHandler),
     (r'/winery/(\d+)/?', WineryHandler),
-    ]
+]

@@ -1,6 +1,7 @@
 from truth.models.base import BaseModel
 from truth.stubs import ndb
 
+
 class WineBottle(BaseModel):
     # Parent: wine
     wine = ndb.KeyProperty()
@@ -9,14 +10,15 @@ class WineBottle(BaseModel):
     purchase_location = ndb.StringProperty()
     storage_location1 = ndb.StringProperty()
     storage_location2 = ndb.StringProperty()
-    cost = ndb.IntegerProperty() # Stored as number of cents
+    cost = ndb.IntegerProperty()  # Stored as number of cents
     consumed = ndb.BooleanProperty(default=False)
     consumed_date = ndb.DateProperty()
 
     json = ndb.JsonProperty(indexed=False)
 
     def config(self, data):
-        self.apply(['bottle_size','purchase_date','purchase_location','storage_location1','storage_location2','consumed','consumed_date'],data)
+        self.apply(['bottle_size', 'purchase_date', 'purchase_location', 'storage_location1',
+                    'storage_location2', 'consumed', 'consumed_date'], data)
         
         if 'cost' in data and data['cost'] != '':
             self.cost = int(float(data['cost']) * 100)
@@ -25,7 +27,7 @@ class WineBottle(BaseModel):
         json = BaseModel.tidy_up_the_post_object(data)
         self.json = json
 
-        key = self.put();
+        key = self.put()
         return key
 
     def create(self, data):
@@ -40,4 +42,3 @@ class WineBottle(BaseModel):
 
     def delete(self):
         self.key.delete()
-
