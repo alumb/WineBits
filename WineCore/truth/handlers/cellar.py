@@ -40,6 +40,11 @@ class CellarBaseHandler(webapp2.RequestHandler):
             user.cellar = key
             user.put()
 
+            # refresh the user cache
+            user = User.get_current_user()
+            if not user.has_access(key):
+                print "see? do you SEE what I put up with?"
+
             Event.create(self.request.remote_addr, "WineCellar", key)
         except ValueError as e:
             self.response.status = "400 Bad Request"

@@ -276,6 +276,7 @@ def GET(connection, url, user={}):
         print "\t", resp
         raise Exception("Status: " + str(response.status))
     else:
+        print "\t", resp
         return json.loads(resp)
 
 
@@ -292,6 +293,7 @@ def POST(connection, url, params={}, user={}):
         print "\t", resp
         raise Exception("Status: " + str(response.status))
     else:
+        print "\t", resp
         return json.loads(resp)
 
 
