@@ -11,13 +11,11 @@ class BaseModel(ndb.Model):
     """
     Utility functions
     """
-    def has_key(self, key):
+
+    def __contains__(self, key):
         dict_ = self.to_dict()
         return (key in dict_ and dict_[key] and dict_[key] != ""
                 and dict_[key] != {})
-
-    def __contains__(self, key):
-        return self.has_key(key)
 
     def apply(self, fields, data):
         for field in fields:
