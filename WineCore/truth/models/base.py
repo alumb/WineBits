@@ -1,8 +1,11 @@
 from truth.stubs import ndb
+from datetime import datetime
 import json
+
 
 class YouNeedATokenForThat(Exception):
     pass
+
 
 class BaseModel(ndb.Model):
     """
@@ -13,12 +16,28 @@ class BaseModel(ndb.Model):
         return (key in dict_ and dict_[key] and dict_[key] != ""
                 and dict_[key] != {})
 
+    def apply(self, fields, data):
+        for field in fields:
+            if field in data:
+                value = None
+                field_type = type(getattr(type(self), field))
+                if field_type == ndb.DateProperty:
+                    value = datetime.strptime(data[field], '%Y/%m/%d')
+                elif field_type == ndb.IntegerProperty:
+                    value = int(data[field])
+                elif field_type == ndb.BooleanProperty:
+                    value = data[field].lower() == "true"
+                else:
+                    value = data[field]
+                setattr(self, field, value)
+                del data[field]
+
     @staticmethod
     def partial_search_string(string):
         """
-        In order for GAE Search to do a partial text search on a string, 
+        In order for GAE Search to do a partial text search on a string,
         you need to store it as a text document containing each possible
-        partial text combo: 
+        partial text combo:
 
         >>> BaseModel.partial_search_string("hello")
         'h he hel hell hello'
@@ -27,24 +46,24 @@ class BaseModel(ndb.Model):
         'h he hel hell hello w wo wor worl world'
 
         This clearly implies left-only partial text - i.e.
-        "hell" will find "hello world" but "orl" will not. 
+        "hell" will find "hello world" but "orl" will not.
 
         """
         chunks = []
         words = string.split(" ")
         for word in words:
-            for i in range(1, len(word)+1):
-                chunks.append( word[0:i] )
+            for i in range(1, len(word) + 1):
+                chunks.append(word[0:i])
         return " ".join(chunks)
 
     @staticmethod
     def tidy_up_the_post_object(post):
         """
-        Before the POST dict can be used, we want to remove any 
-            fields that might conflict with names we're using. 
+        Before the POST dict can be used, we want to remove any
+            fields that might conflict with names we're using.
         If the POST object has a 'json' key, anything underneath that
-            key is extracted and moved to the base object. 
-        If a key's value is a JSON string, it's parsed (if possible). 
+            key is extracted and moved to the base object.
+        If a key's value is a JSON string, it's parsed (if possible).
         """
         post = BaseModel._add_json_fields_to_the_post_object(post)
         post = BaseModel._remove_reserved_fields_from_the_post_object(post)
@@ -102,6 +121,3 @@ class BaseModel(ndb.Model):
         if 'json' in post:
             del post['json']
         return post
-
-
-

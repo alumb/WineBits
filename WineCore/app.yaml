@@ -22,11 +22,11 @@ handlers:
 - url: /donk
   static_dir: cellar/CrimsonDisk
 
+- url: /kitchen
+  static_dir: kitchen/www
+
 - url: /style
   static_dir: style
-
-#- url: .*
-#  script: main.app
 
 skip_files:
 - ^cellar/PineSocks/.sencha/*

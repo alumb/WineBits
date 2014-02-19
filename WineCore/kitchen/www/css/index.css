@@ -1,0 +1,43 @@
+
+.wb-logo {
+    background: url('../img/logo_32.png');
+    display: block;
+    width: 32px;
+    height: 32px;
+}
+
+.contextual-menu {
+    padding-top: 10px;
+    padding-right: 10px;
+}
+
+.contextual-menu .form-control{
+    width: 60%;
+}
+
+.undernav{
+    height: 70px;
+}
+
+.searchresult{
+    padding: 0 5px 0 0;
+    margin: 0;
+}
+.searchresult ul{
+    padding: 0;
+    margin: 0;
+}
+.searchresult > ul > li{
+    width: 100%;
+    list-style-type: none;
+    padding: 10px;
+    margin-bottom: 2px;
+}
+
+.searchresult .wine-opt{
+    margin-bottom: 10px;
+}
+.searchresult .wine-opt .collapse{
+    margin-top: 4px;
+}
+ 

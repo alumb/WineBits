@@ -72,6 +72,20 @@ parent: Winery
 cellarTrackerID gets you https://www.cellartracker.com/wine.asp?iWine=<cellarTrackerID>
 display name: <varietal> <winery name> <varietal> <name>
  
+### UserWine ###
+parent: Wine
+#### fields ###
+- user: 123456890123456
+- drink_after: 2013/10/1
+- drink_before: 2015/10/1
+- tags: ["cheap","Special Occasion"]
+
+#### urls ####
+- create: POST /truth/winery/_winery-id_/wine/_wine-id_/userwine
+- read:   GET /truth/winery/_winery-id_/wine/_wine-id_/userwine/_userwine-id_
+- update: POST /truth/winery/_winery-id_/wine/_wine-id_/userwine/_userwine-id_
+- delete: DELETE /truth/winery/_winery-id_/wine/_wine-id_/userwine/_userwine-id_
+
 ### WineCellar ###
 #### fields ####
 - id: 1234567890123456
@@ -93,7 +107,7 @@ need permission to log in and add / remove / drink bottles.
 Parent: cellar
 #### fields ####
 - id: 1234567890123456
-- UserID: 1234567890123456
+- user: 1234567890123456
 - permission: 'owner' //from: ['read', 'write', 'owner']
 
 #### urls ####
@@ -107,17 +121,14 @@ Parent: cellar
 - id: 5665783417929728
 - wine_key: 1234567890123456
 - bottleSize: "750ml"
-- storageLocation1: "cellar"
-- storageLocation2: "Rack 5 row 2"
-- drinkAfter: 2013/10/1
-- drinkBefore: 2015/10/1
-- purchaseDate: 2012/10/1
-- deliveryDate: null
-- purcahseLocation: 'winery'
+- storage_location1: "cellar"
+- storage_location2: "Rack 5 row 2"
+- purchase_date: 2012/10/1
+- delivery_date: null
+- purcahse_location: 'winery'
 - cost: $18
-- value: 5 //5 star rating for value the wine. ie: special occasion vs random Tuesday wine
 - consumed: false 
-- consumedDate: null
+- consumed_date: null
 - json: {}
 
 #### urls ####
@@ -131,12 +142,12 @@ Parent: cellar
 bottleSizes: [750ml, 1.5L, 375ml, 500ml, 50ml, 100ml, 187ml, 200ml, 250ml, 300ml, 330ml, 620ml, 700ml, 1.0L, 1.75L, 3.0L, 3.78L, 4.0L, 5.0L, 6.0L, 9.0L, 12.0L, 15.0L, 16.0L, 18.0L, 27.0L, 1.125L, 2.5L]
 
 ### WineTasting ###
-Parent: wine
+Parent: UserWine
 #### fields ####
 - id: 1234567890123456
-- consumptionType: 'tasting' //from:['fromMyCellar','tasting',...]
-- consumptionLocation: 'winery' //from: ['home', 'winery', 'restaurant']
-- consumptionLocationName: null //name if at restaurant
+- consumption_type: 'tasting' //from:['fromMyCellar','tasting',...]
+- consumption_location: 'winery' //from: ['home', 'winery', 'restaurant']
+- consumption_location_name: null //name if at restaurant
 - date: 2013/8/25
 - rating: 92
 - flawed: false
@@ -162,7 +173,7 @@ Parent: wine
 ### Event ###
 #### fields ####
 - id: 1234567890123456
-- userID: 1234567890123456
+- user: 1234567890123456
 - action: "update"
 - model: "Key('Winery', 5639274879778816, 'Wine', 5707702298738688)"
 - model_type: "Wine"

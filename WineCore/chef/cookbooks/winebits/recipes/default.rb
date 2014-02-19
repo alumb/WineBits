@@ -1,7 +1,4 @@
 package "python-pip"
-package "ack-grep" 
-package "vim" 
-package "make"
 
 execute "install virtualenv" do
     command "pip install virtualenv" 

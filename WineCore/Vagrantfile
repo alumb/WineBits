@@ -10,16 +10,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # please see the online documentation at vagrantup.com.
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "raring64"
 
-  # The url from where the 'config.vm.box' box will be fetched if it
-  # doesn't already exist on the user's system.
+  # Raring64 is out: SenchaCMD won't install in 64-bit linux
+  config.vm.box = "raring64"
   config.vm.box_url = "http://goo.gl/Y4aRr"
+
+  #config.vm.box = "saucy32"
+  #config.vm.box_url = "http://cloud-images.ubuntu.com/vagrant/saucy/current/saucy-server-cloudimg-amd64-vagrant-disk1.box"
+
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
-  config.vm.network :forwarded_port, guest: 8000, host: 8000
+  config.vm.network :forwarded_port, guest: 8000, host: 8001
   config.vm.network :forwarded_port, guest: 8080, host: 8081
   config.vm.network :forwarded_port, guest: 35802, host: 35802
 
@@ -89,19 +92,23 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.roles_path = "chef/roles"
     chef.data_bags_path = "chef/data_bags"
     chef.add_recipe "apt" 
+    chef.add_recipe "always_useful"
     chef.add_recipe "gae" 
-    chef.add_recipe "heroic"
     chef.add_recipe "java" 
     chef.add_recipe "SenchaCmd"
-    #chef.json = {
-    #  :java => {
-    #    :install_flavor => 'openjdk',
-    #    :jdk_version => 7,
-    #    :oracle => {
-    #      "accept_oracle_download_terms" => true
-    #    }
-    #  }
-    #}
+    chef.add_recipe "nodejs"
+    chef.add_recipe "phonegap"
+    
+    chef.add_recipe "winebits"
+    chef.json = {
+        :java => {
+            :install_flavor => 'oracle', 
+            :jdk_version => 7,
+            :oracle => {
+                "accept_oracle_download_terms" => true
+            }
+        }
+    }
   end
 
   # Enable provisioning with chef server, specifying the chef server URL,

@@ -1,6 +1,8 @@
-from truth.stubs import webapp2 
-from truth.views.jsonview import json_response 
+from truth.stubs import webapp2
+from truth.views.jsonview import json_response
 from truth import regions
+from truth.models.winery import Winery
+
 
 class LocationHandler(webapp2.RequestHandler):
     """

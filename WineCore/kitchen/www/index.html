@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=medium-dpi" />
+
+        <!-- TODO: Download these files locally -->
+        <link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,700,300,100|Roboto:400,500,700,400italic,900,300' rel='stylesheet' type='text/css'>  
+        <link rel="stylesheet" type="text/css" href="libs/bootstrap/css/bootstrap.min.css" />
+        <link rel="stylesheet" type="text/css" href="libs/bootstrap/css/bootstrap-theme.min.css" />
+        <link rel="stylesheet" type="text/css" href="libs/font-awesome-4.0.3/css/font-awesome.min.css" />
+        <link rel="stylesheet" type="text/css" href="css/index.css" />
+
+        <title>WineBits Alpha</title>
+    </head>
+    <body>
+        <div class="app">
+            <nav class="navbar navbar-default navbar-fixed-top">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle pull-left" data-toggle="collapse" data-target="#navbar-collapse"> 
+                            <i class='fa fa-bars fa-lg'></i>
+                        </button>
+                        <button type="button" class="navbar-toggle pull-left" data-toggle="collapse" data-target="#navbar-collapse-searchoptions"> 
+                            <i class='fa fa-search fa-lg'></i>
+                        </button>
+                        <div class="contextual-menu">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="collapse navbar-collapse" id="navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            <li class="active"><a href="#">All Wines</a></li>
+                            <li><a href="#">Cellar</a></li>
+                            <li><a href="#">Messages <span class='badge'>22</span></a></li>
+                        </ul>
+                    </div>
+                    <div class="collapse navbar-collapse" id="navbar-collapse-searchoptions">
+                        <ul class="nav navbar-nav">
+                            <li><a href="#">Advanced Search Options!</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+            <div class="undernav"></div>
+            <div class="container-fluid">
+            <div class='col-md-6 searchresult'>
+                <h4>Wines</h4>
+                <ul>
+                    <li class="bg-info">
+                        <h4>Limeblack Estates</h4>
+
+                        <p>2011 Cabernet Sauvignon</p>
+
+                        <div class="row">
+                        <div class="col-sm-4 wine-opt"> 
+                            Cellar
+                            <div class="btn-group pull-right">
+                                <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#cellar">3</button>
+                                <button type="button" class="btn btn-default"><i class='fa fa-plus'></i></button>
+                            </div>
+                            <div class="clearfix"></div>
+                            <ul id="cellar" class="collapse">
+                                <li> Bottle 1 </li>
+                                <li> Bottle 2 </li>
+                                <li> Bottle 3 </li>
+                            </ul>
+                        </div>
+                        <div class="col-sm-4 wine-opt">
+                            My Opinion
+                            <div class="btn-group pull-right">
+                                <button type="button" class="btn btn-default"><i class="fa fa-thumbs-o-down"></i></button>
+                                <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#rating"><i class="fa fa-align-left"></i></button>
+                                <button type="button" class="btn btn-info"><i class="fa fa-thumbs-o-up"></i></button>
+                            </div>
+                            <div class="clearfix"></div>
+                            <form id="rating" class="collapse">
+                                <textarea class="form-control" rows="8" placeholder="What did you think of this wine?"></textarea>
+                                <button type="button" class="btn btn-default pull-right"><i class="fa fa-check"></i></button> 
+                                <div class="clearfix"></div>
+                            </form>
+                        </div>
+                        <div class="col-sm-4 wine-opt">
+                            Rating
+                            <div class="btn-group pull-right">
+                                <button type="button" class="btn btn-default">75% <i class="fa fa-thumbs-up"></i></button>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        </div>
+
+
+                        <div class="row">
+                        <div class="col-sm-4 wine-opt">
+                            Tags
+                            <div class="btn-group-vertical pull-right btn-group-sm">
+                                <button type="button" class="btn btn-default"><i class="fa fa-money"></i> Cheap</button>
+                                <button type="button" class="btn btn-default"><i class="fa fa-money"></i> Expensive</button>
+                                <button type="button" class="btn btn-info"><i class="fa fa-group"></i> Gift</button>
+                                <button type="button" class="btn btn-default"><i class="fa fa-cutlery"></i> Chicken</button>
+                                <button type="button" class="btn btn-info"><i class="fa fa-cutlery"></i> Spicy Foods</button>
+                                <button type="button" class="btn btn-default"><i class="fa fa-ellipsis-h"></i></button>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="col-sm-8 wine-ops">
+                            Images
+                            <div class="row">
+                                <div class="col-xs-8">
+                                    <a href="#" class="thumbnail">
+                                        <img src="http://placekitten.com/400/200">
+                                    </a>
+                                </div>
+                                <div class="col-xs-4">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-default"><i class="fa fa-camera"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        </div>
+                    </li>
+                    <li class="bg-info" > Monster Vineyards - 2012 Merlot </li>
+                </ul>
+            </div>
+            <div class='col-md-6 searchresult'>
+                <h4>Wineries</h4>
+                <ul>
+                    <li class="bg-primary"> Limeblack Estates </li>
+                    <li class="bg-info"> Monster Vineyards </li>
+                </ul>
+            </div>
+            </div>
+
+        </div>
+        <!-- Loading -->
+        <script type="text/javascript" src="phonegap.js"></script>
+        <script type="text/javascript" src="libs/jquery.js"></script>
+        <script type="text/javascript" src="libs/modernizr-latest.js"></script>
+        <script type="text/javascript" src="libs/bootstrap/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="libs/handlebars-1.1.2.js"></script>
+        <script type="text/javascript" src="libs/ember-1.3.1.js"></script>
+        <script data-main="js/main" type="text/javascript" src="libs/require.js"></script>
+    </body>
+</html>

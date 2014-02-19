@@ -3,7 +3,7 @@
 #TODO: Fill in
 
 region_map = {
-    u"Argentina":[
+    u"Argentina": [
         u"Mendoza",
         u"San Juan",
         u"Buenos Aires",
@@ -13,10 +13,10 @@ region_map = {
         u"La Rioja",
         u"Catamarca"
     ],
-    u"Bolivia":[
+    u"Bolivia": [
         u"Tarija"
     ],
-    u"Brazil":[
+    u"Brazil": [
         [u"Rio Grande do Sul", [
             u"Bento Gonçalves",
             u"Caxias do Sul",
@@ -50,7 +50,7 @@ region_map = {
             u"Jundiaí",
             u"São Roque"]]
     ],
-    u"Canada":[
+    u"Canada": [
         [u"British Columbia", [
             u"Fraser Valley",
             u"Gulf Islands",
@@ -66,11 +66,12 @@ region_map = {
             u"Toronto"]],
         [u"Quebec", [
             u"Eastern Townships"]]
-    ], 
-    u"San Randomino, The Magical Country Where Test Data Lives":[
+    ],
+    u"San Randomino, The Magical Country Where Test Data Lives": [
         "Inchoatius"
     ]
 }
+
 
 def format_region(country, region=None, subregion=None):
     if country and region and subregion:
@@ -79,6 +80,7 @@ def format_region(country, region=None, subregion=None):
         return "%s - %s" % (country, region)
     if country:
         return country
+
 
 def get_regions_subregions():
     return_regions = []
@@ -92,10 +94,10 @@ def get_regions_subregions():
                 region = region[0]
                 for subregion in subregions:
                     location_list.append((format_region(country, region, subregion),
-                                            (country, region, subregion)))
+                                          (country, region, subregion)))
                     return_subregions.append(subregion)
             location_list.append((format_region(country, region),
-                                    (country, region, None)))
+                                  (country, region, None)))
             return_regions.append(region)
     location_list = sorted(location_list)
     return return_regions, return_subregions, location_list
@@ -104,6 +106,7 @@ countries = region_map.keys()
 regions, subregions, location_tuples = get_regions_subregions()
 location_list = [x[0] for x in location_tuples]
 location_map = {location: tup for (location, tup) in location_tuples}
+
 
 def regions_for_country(country):
     return_regions = []
@@ -114,6 +117,7 @@ def regions_for_country(country):
             return_regions.append(region)
     return return_regions
 
+
 def subregions_for_country(country, region):
     return_subregions = []
     for region_ in region_map[country]:
@@ -121,9 +125,9 @@ def subregions_for_country(country, region):
             return_subregions = return_subregions + region_[1]
     return return_subregions
 
+
 def get_country(region):
     for country in countries:
         if region in regions_for_country(country):
             return country
     return None
-

@@ -1,6 +1,7 @@
-from truth.stubs import webapp2 
-from truth.views.jsonview import json_response 
+from truth.stubs import webapp2
+from truth.views.jsonview import json_response
 from truth import regions
+
 
 class CountryHandler(webapp2.RequestHandler):
     """
@@ -9,6 +10,7 @@ class CountryHandler(webapp2.RequestHandler):
     def get(self):
         json_response(self, regions.countries)
 
+
 class RegionHandler(webapp2.RequestHandler):
     """
     GET /country/Canada : list regions
@@ -16,6 +18,7 @@ class RegionHandler(webapp2.RequestHandler):
 
     def get(self, country):
         json_response(self, regions.regions_for_country(country))
+
 
 class SubRegionHandler(webapp2.RequestHandler):
     """

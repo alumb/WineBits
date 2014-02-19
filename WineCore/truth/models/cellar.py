@@ -1,31 +1,19 @@
 from truth.models.base import BaseModel
-from truth.constants import MAX_RESULTS
-from truth.stubs import ndb, search
+from truth.stubs import ndb
+
 
 class WineCellar(BaseModel):
     name = ndb.StringProperty()
 
     def create(self, data):
-        name = None
-        if 'name' in data:
-            name = data['name']
-            self.name = name
-            del data['name']
-
-        key = self.put();
+        self.apply(["name"], data)
+        key = self.put()
         return key
 
     def modify(self, data):
-        name = None
-        if 'name' in data:
-            name = data['name']
-            self.name = name
-            del data['name']
-
-        key = self.put();
+        self.apply(["name"], data)
+        key = self.put()
         return key
 
     def delete(self):
         self.key.delete()
-
-

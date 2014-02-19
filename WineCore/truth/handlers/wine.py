@@ -1,9 +1,10 @@
 from truth.models.base import YouNeedATokenForThat
 from truth.stubs import webapp2, ndb
-from truth.views.jsonview import json_response 
+from truth.views.jsonview import json_response
 from truth.models.wine import Wine
 from truth.models.winery import Winery
 from truth.models.event import Event
+
 
 class WineryWineBaseHandler(webapp2.RequestHandler):
     def get(self, winery_id):
@@ -29,14 +30,14 @@ class WineryWineBaseHandler(webapp2.RequestHandler):
 
         if not winery:
             self.response.status = "404 Not Found"
-            self.response.write("404 Not found." )
+            self.response.write("404 Not found.")
             return
 
         post = self.request.POST
 
         wine = Wine(parent=winery_key)
         try:
-            key = wine.create( post, winery )
+            key = wine.create(post, winery)
             wine.update(winery)
             Event.create(self.request.remote_addr, "Wine", key)
         except ValueError as e:
@@ -46,6 +47,7 @@ class WineryWineBaseHandler(webapp2.RequestHandler):
 
         json_response(self, wine)
 
+
 class WineryWineHandler(webapp2.RequestHandler):
     def get(self, winery_id, wine_id):
         wine_key = ndb.Key(Winery, int(winery_id), Wine, int(wine_id))
@@ -53,7 +55,7 @@ class WineryWineHandler(webapp2.RequestHandler):
 
         if not wine:
             self.response.status = "404 Not Found"
-            self.response.write("404 Not found." )
+            self.response.write("404 Not found.")
             return
 
         json_response(self, wine)
@@ -66,7 +68,7 @@ class WineryWineHandler(webapp2.RequestHandler):
 
         if not winery or not wine:
             self.response.status = "404 Not Found"
-            self.response.write("404 Not found." )
+            self.response.write("404 Not found.")
             return
 
         post = self.request.POST
