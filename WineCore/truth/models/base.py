@@ -16,6 +16,9 @@ class BaseModel(ndb.Model):
         return (key in dict_ and dict_[key] and dict_[key] != ""
                 and dict_[key] != {})
 
+    def __contains__(self, key):
+        return self.has_key(key)
+
     def apply(self, fields, data):
         for field in fields:
             if field in data:

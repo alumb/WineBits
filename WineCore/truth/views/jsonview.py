@@ -1,8 +1,7 @@
 from truth.models.wine import Wine
 from truth.models.winery import Winery
-from truth.stubs import debug, ndb
+from truth.stubs import debug, ndb, users
 from datetime import date
-from google.appengine.api import users
 import json
 
 
@@ -27,7 +26,20 @@ def get_url(model):
 
 
 def model_to_json(model, extended_listing=False):
+    """
+    Convert a Model to a JSON-serializable-object
 
+    If extended_listing is set, expand Key references to complete objects.
+    (Warning: expanding a circular reference may cause universe to end)
+
+        >>> v = Winery()
+        >>> key = v.create({'name':'Winery'})
+        >>> winery_json = model_to_json(v)
+        >>> print winery_json
+        {...'name': 'Winery'...}
+
+
+    """
     try:
         url = get_url(model)
         try:

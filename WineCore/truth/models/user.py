@@ -1,6 +1,5 @@
 from truth.models.base import BaseModel
-from truth.stubs import ndb
-from google.appengine.api import users
+from truth.stubs import ndb, users
 
 import logging
 

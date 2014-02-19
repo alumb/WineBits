@@ -245,3 +245,12 @@ else:
         class AtomField(object):
             def __init__(self, *args, **kwargs):
                 pass
+
+if google_is_here:
+    from google.appengine.api import users
+else:
+    class users:
+        class User(object):
+            def __init__(self, *args, **kwargs):
+                pass
+        pass

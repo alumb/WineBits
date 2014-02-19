@@ -1,5 +1,4 @@
-from truth.stubs import webapp2, ndb
-from google.appengine.api import users
+from truth.stubs import webapp2, ndb, users
 from truth.views.jsonview import json_response
 from truth.constants import MAX_RESULTS
 from truth.models.event import Event
