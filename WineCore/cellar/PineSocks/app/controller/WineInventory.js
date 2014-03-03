@@ -1,5 +1,8 @@
 Ext.define('WineCellar.controller.WineInventory', {
 	extend: 'Ext.app.Controller',
+	requires:[
+		'Ext.JSON'
+	],
 	views:["Inventory","WineBottleEdit"],
 	models:["WineBottle"],
 	stores:["WineInventory"],
@@ -17,7 +20,7 @@ Ext.define('WineCellar.controller.WineInventory', {
 					var record = wineryCombo.findRecordByValue(wineryCombo.getValue());
 					if(!Ext.isEmpty(record)) {
 						var id = record.get("id");
-						queryPlan.query += " winery_id:" + id
+						queryPlan.combo.getStore().getProxy().winery_id = id;
 					}
 				},
 				'select':function(combo,record) {
@@ -52,6 +55,13 @@ Ext.define('WineCellar.controller.WineInventory', {
 		});
 		this.application.on({	
 		
+		});
+		Ext.Ajax.request({
+			url:"/truth/cellar",
+			success: function(response) {
+				this.cellar = Ext.JSON.decode(response.responseText);
+				Ext.getStore("WineInventory").load();
+			}
 		});
 	}
 });

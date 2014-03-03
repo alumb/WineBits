@@ -58,10 +58,11 @@ def model_to_json(model, extended_listing=False):
             object_['url'] = url
         if id_:
             object_['id'] = id_
-        for key, value in object_.iteritems():
+        for key, value in object_.items():
             if issubclass(type(value), ndb.Key):
                 if extended_listing:
-                    object_[key] = model_to_json(value.get(), extended_listing)
+                    del object_[key]
+                    object_[value.kind()] = model_to_json(value.get(), extended_listing)
                 else:
                     object_[key] = value.id()
             if issubclass(type(value), date):
@@ -88,6 +89,10 @@ def json_response(handler, model, extended_listing=False):
     Strip out any 'json' field
 
     """
+
+    if extended_listing is False:
+        extended_listing = handler.request.get("extended_listing", "false").lower() == "true"
+
     if type(model) != list:
         object_ = model_to_json(model, extended_listing)
     else:

@@ -7,22 +7,24 @@ Ext.define('WineCellar.model.Wine', {
 		{name:'winetype', type:'string'},
 		{name:'year', type:'int'},
 		{name:'upc', type:'string'},
-		{name:'verified', type:'boolean'},
-		{name:'winery_id', type:'int'}
+		{name:'verified', type:'boolean'}
 	],
 	associations:[{
 		type:"hasOne",
-		associationKey:"winery", //this is the name in json
+		associationKey:"Winery", //this is the name in json
 		model:"WineCellar.model.Winery",
 		name:"winery",
 		getterName:"getWinery",
 		setterName:"setWinery"
-
 	}],
 	proxy: {
-		type: 'ajax',
-		url:"../truth/search",
+		type: 'rest',
+		getUrl: function(request) {
+			if(!Ext.isEmpty(request.url)) { return request.url; }
+			return "../truth/winery/" + this.winery_id + "/wine";
+		},		
 		noCache:false,
+		extraParams:{extended_listing:"true"},
 		reader: {
 			type: 'json',
 			root: 'wines'

@@ -27,7 +27,7 @@ class WineBottleBaseHandler(webapp2.RequestHandler):
         qry = WineBottle.query(ancestor=cellar.key)
         results = qry.fetch(MAX_RESULTS)
 
-        json_response(self, results, True)
+        json_response(self, results)
 
     def post(self, cellar_id):
 

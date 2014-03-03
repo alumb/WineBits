@@ -21,7 +21,7 @@ class WineTastingBaseHandler(webapp2.RequestHandler):
         qry = WineTasting.query(ancestor=userwine.key)
         results = qry.fetch(MAX_RESULTS)
 
-        json_response(self, results, True)
+        json_response(self, results)
 
     def post(self, winery_id, wine_id, userwine_id):
         userwine_key = ndb.Key(Winery, int(winery_id), Wine, int(wine_id), UserWine, int(userwine_id))

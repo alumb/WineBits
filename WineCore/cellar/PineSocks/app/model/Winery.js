@@ -4,14 +4,14 @@ Ext.define('WineCellar.model.Winery', {
 		{name:'name', type:'string'},
 		{name:'location', type:'string'},
 		{name:'verified', type:'string'},
-		{name:'id', type:'string'},
 		{name:'url', type:'string'},
 		{name:'key', type:'string'}
 	],
 	proxy: {
-		type: 'ajax',
-		url:"../truth/search",
+		type: 'rest',
+		url:"../truth/winery",
 		noCache:false,
+		extraParams:{extended_listing:"true"},
 		reader: {
 			type: 'json',
 			root: 'wineries'
