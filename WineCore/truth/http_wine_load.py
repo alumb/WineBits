@@ -267,22 +267,21 @@ def load_tastings(connection, userwines, count):
 
 def GET(connection, url, user={}):
     url = prelude + url
-    print "Get: ", url
+    print "Get: ", url,
     connection.request("GET", url, None, user)
     response = connection.getresponse()
     print "\t", response.status
     resp = response.read()
     if response.status != 200:
-        print "\t", resp
+        print resp
         raise Exception("Status: " + str(response.status))
     else:
-        print "\t", resp
         return json.loads(resp)
 
 
 def POST(connection, url, params={}, user={}):
     url = prelude + url
-    print "POST: ", url
+    print "POST: ", url,
     params = urllib.urlencode(params)
     connection.request("POST", url, params, user)
     response = connection.getresponse()
@@ -290,10 +289,9 @@ def POST(connection, url, params={}, user={}):
     resp = response.read()
     if response.status != 200:
         print "params: " + str(params)
-        print "\t", resp
+        print resp
         raise Exception("Status: " + str(response.status))
     else:
-        print "\t", resp
         return json.loads(resp)
 
 
