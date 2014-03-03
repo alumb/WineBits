@@ -10,7 +10,11 @@ from truth.models.user import User
 
 
 class WineBottleBaseHandler(webapp2.RequestHandler):
-    def get(self, cellar_id):
+    def get(self, cellar_id=None):
+
+        if cellar_id is None:
+            cellar_id = User.get_current_user().cellar.id()
+
         cellar_key = ndb.Key(WineCellar, int(cellar_id))
         cellar = cellar_key.get()
 
@@ -29,7 +33,10 @@ class WineBottleBaseHandler(webapp2.RequestHandler):
 
         json_response(self, results)
 
-    def post(self, cellar_id):
+    def post(self, cellar_id=None):
+
+        if cellar_id is None:
+            cellar_id = User.get_current_user().cellar.id()
 
         cellar_key = ndb.Key(WineCellar, int(cellar_id))
         cellar = cellar_key.get()
@@ -69,7 +76,14 @@ class WineBottleBaseHandler(webapp2.RequestHandler):
 
 
 class WineBottleHandler(webapp2.RequestHandler):
-    def get(self, cellar_id, winebottle_id):
+
+    # if winebottle_id is None, the winebottle_id is in cellar_id and the cellar_id is the cellar
+    # of this user.
+    def get(self, cellar_id, winebottle_id=None):
+
+        if winebottle_id is None:
+            winebottle_id = cellar_id
+            cellar_id = User.get_current_user().cellar.id()
 
         bottle_key = ndb.Key(WineCellar, int(cellar_id), WineBottle, int(winebottle_id))
         bottle = bottle_key.get()
@@ -86,7 +100,12 @@ class WineBottleHandler(webapp2.RequestHandler):
 
         json_response(self, bottle)
 
-    def post(self, cellar_id, winebottle_id):
+    def post(self, cellar_id, winebottle_id=None):
+
+        if winebottle_id is None:
+            winebottle_id = cellar_id
+            cellar_id = User.get_current_user().cellar.id()
+
         bottle_key = ndb.Key(WineCellar, int(cellar_id), WineBottle, int(winebottle_id))
         bottle = bottle_key.get()
 
@@ -122,7 +141,11 @@ class WineBottleHandler(webapp2.RequestHandler):
         else:
             json_response(self, {"error": "there was no wine_id", "post": self.request.body})
 
-    def delete(self, cellar_id, winebottle_id):
+    def delete(self, cellar_id, winebottle_id=None):
+
+        if winebottle_id is None:
+            winebottle_id = cellar_id
+            cellar_id = User.get_current_user().cellar.id()
 
         bottle_key = ndb.Key(WineCellar, int(cellar_id), WineBottle, int(winebottle_id))
         bottle = bottle_key.get()
@@ -145,5 +168,7 @@ class WineBottleHandler(webapp2.RequestHandler):
         
 routes = [
     (r'/cellar/(\d+)/wine/?', WineBottleBaseHandler),
+    (r'/cellar/wine/?', WineBottleBaseHandler),
     (r'/cellar/(\d+)/wine/(\d+)/?', WineBottleHandler),
+    (r'/cellar/wine/(\d+)/?', WineBottleHandler),
 ]

@@ -138,6 +138,13 @@ Parent: cellar
 - update: POST /truth/cellar/_cellar-id_/wine/_winebottle-id_
 - delete: DELETE /truth/cellar/_cellar-id_/wine/_winebottle-id_
 
+if the _cellar-id_ is not specified, it is assumed to be the cellar of the current user.
+- list:   GET /truth/cellar/wine 
+- create: POST /truth/cellar/wine
+- read:   GET /truth/cellar/wine/_winebottle-id_
+- update: POST /truth/cellar/wine/_winebottle-id_
+- delete: DELETE /truth/cellar/wine/_winebottle-id_
+
 #### notes ####
 bottleSizes: [750ml, 1.5L, 375ml, 500ml, 50ml, 100ml, 187ml, 200ml, 250ml, 300ml, 330ml, 620ml, 700ml, 1.0L, 1.75L, 3.0L, 3.78L, 4.0L, 5.0L, 6.0L, 9.0L, 12.0L, 15.0L, 16.0L, 18.0L, 27.0L, 1.125L, 2.5L]
 
