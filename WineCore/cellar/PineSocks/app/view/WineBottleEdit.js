@@ -73,7 +73,6 @@ Ext.define("WineCellar.view.WineBottleEdit", {
 			name:"wine",
 			fieldLabel:"Wines",
 			typeAhead: false,
-			queryParam:'q',
 			minChars:2,
 			triggerAction:'last',
 			flex:1,

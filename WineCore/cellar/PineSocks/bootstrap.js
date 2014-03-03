@@ -9,7 +9,8 @@ Ext.Loader.addClassPathMappings({
   "Ext.Msg": "ext/src/window/MessageBox.js",
   "Ext.rtl.EventObjectImpl": "ext/src/rtl/EventObject.js",
   "ExtThemeNeptune": "ext/packages/ext-theme-neptune/overrides",
-  "WineCellar": "app"
+  "WineCellar": "app",
+  "WineCellar.model.WineCellar": "app/model/WineCellar.js"
 });
 Ext.ClassManager.addNameAlternateMappings({
   "Ext.AbstractComponent": [],
@@ -413,6 +414,7 @@ Ext.ClassManager.addNameAlternateMappings({
   ],
   "Ext.grid.RowEditor": [],
   "Ext.grid.RowEditorButtons": [],
+  "Ext.grid.Scroller": [],
   "Ext.grid.View": [],
   "Ext.grid.ViewDropZone": [],
   "Ext.grid.column.Action": [
@@ -852,6 +854,7 @@ Ext.ClassManager.addNameAlternateMappings({
   "WineCellar.model.Varietal": [],
   "WineCellar.model.Wine": [],
   "WineCellar.model.WineBottle": [],
+  "WineCellar.model.WineCellar": [],
   "WineCellar.model.WineType": [],
   "WineCellar.model.Winery": [],
   "WineCellar.store.Locations": [],
@@ -1307,6 +1310,7 @@ Ext.ClassManager.addNameAliasMappings({
   "Ext.grid.RowEditorButtons": [
     "widget.roweditorbuttons"
   ],
+  "Ext.grid.Scroller": [],
   "Ext.grid.View": [
     "widget.gridview"
   ],
@@ -1880,6 +1884,7 @@ Ext.ClassManager.addNameAliasMappings({
   "WineCellar.model.Varietal": [],
   "WineCellar.model.Wine": [],
   "WineCellar.model.WineBottle": [],
+  "WineCellar.model.WineCellar": [],
   "WineCellar.model.WineType": [],
   "WineCellar.model.Winery": [],
   "WineCellar.store.Locations": [],

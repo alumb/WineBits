@@ -1,12 +1,12 @@
 Ext.define('WineCellar.store.WineInventory', {
 	extend:"Ext.data.Store",
 	storeId:"WineInventory",
-	require:[
+	requires:[
 		"WineCellar.model.Wine",
-		'WineCellar.model.Winery'
+		'WineCellar.model.Winery',
+		'WineCellar.model.WineCellar'
 	],
-	model:"WineCellar.model.WineBottle",
-	autoLoad:true
+	model:"WineCellar.model.WineBottle"
 });
 
 

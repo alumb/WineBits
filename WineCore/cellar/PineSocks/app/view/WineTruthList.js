@@ -29,11 +29,8 @@ Ext.define("WineCellar.view.WineTruthList", {
 			'itemclick':function(grid, record, item, index, e, eOpts) {
 				var id = record.get("id");
 				var store = Ext.getStore("Wines");
-				store.load({
-					params:{
-						q:"winery_id:" + id
-					}
-				})
+				store.getProxy().winery_id = id;
+				store.load();
 			}
 		}
 	},{

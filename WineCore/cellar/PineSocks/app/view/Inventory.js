@@ -22,7 +22,6 @@ Ext.define("WineCellar.view.Inventory", {
 	},{
 		xtype:"WineBottleEdit",
 		title:"Edit",
-		collapsible:true,
-		flex:1.5
+		collapsible:true
 	}]
 });

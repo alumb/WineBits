@@ -7,3 +7,4 @@
 *.vagrant
 *.sublime-workspace
 *.swp
+/WineCore/cellar/PineSocks/server/static
