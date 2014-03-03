@@ -4,7 +4,7 @@ Ext.define('WineCellar.model.Location', {
 		{name:'location', type:'string'}
 	],
 	proxy: {
-		type: 'ajax',
+		type: 'rest',
 		url:"../truth/location",
 		reader: {
 			type: 'json',

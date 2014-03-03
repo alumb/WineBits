@@ -4,7 +4,7 @@ Ext.define('WineCellar.model.WineType', {
 		{name:'winetype', type:'string'}
 	],
 	proxy: {
-		type: 'ajax',
+		type: 'rest',
 		url:"../truth/winetype",
 		noCache:false,
 		reader: {
