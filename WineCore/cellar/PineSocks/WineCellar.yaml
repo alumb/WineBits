@@ -1,10 +1,27 @@
 handlers:
-# - url: /cellar/
-#   static_files: cellar/PineSocks/server/static/production/WineCellar/index.html
-#   upload: cellar/PineSocks/server/static/production/WineCellar/index.html
+- url: /cellar/
+  static_files: cellar/PineSocks/server/static/testing/WineCellar/index.html
+  upload: cellar/PineSocks/server/static/testing/WineCellar/index.html
+  login: required
 
 - url: /cellar/
-  static_dir: cellar/PineSocks/
+  static_dir: cellar/PineSocks/server/static/production/WineCellar/
+  login: required
+
+- url: /cellarTest/
+  static_files: cellar/PineSocks/server/static/testing/WineCellar/index.html
+  upload: cellar/PineSocks/server/static/testing/WineCellar/index.html
+  login: required
+
+- url: /cellarTest/
+  static_dir: cellar/PineSocks/server/static/testing/WineCellar/
+  login: required
+
+- url: /cellarDev/
+  static_files: cellar/PineSocks/index.html
+  upload: cellar/PineSocks/server/index.html
+  login: required
 
 - url: /cellarDev/
   static_dir: cellar/PineSocks/
+  login: required
