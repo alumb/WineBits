@@ -154,11 +154,10 @@ Parent: UserWine
 - note: "less sweet than the normal Riesling"
 
 #### urls ####
-- list:   GET /truth/winery/_winery-id_/wine/_wine-id_/tasting
-- list:   GET /truth/winery/_winery-id_/wine/_wine-id_/tasting/_user-id_  //all for a particular user
-- create: POST /truth/winery/_winery-id_/wine/_wine-id_/tasting
-- update: POST /truth/winery/_winery-id_/wine/_wine-id_/tasting/_tasting-id_
-- delete: POST /truth/winery/_winery-id_/wine/_wine-id_/tasting/_tasting-id_
+- list:   GET /truth/winery/_winery-id_/wine/_wine-id_/userwine/_userwine-id_/tasting
+- create: POST /truth/winery/_winery-id_/wine/_wine-id_/userwine/_userwine-id_/tasting
+- update: POST /truth/winery/_winery-id_/wine/_wine-id_/userwine/_userwine-id_/tasting/_tasting-id_
+- delete: POST /truth/winery/_winery-id_/wine/_wine-id_/userwine/_userwine-id_/tasting/_tasting-id_
 
 ### User ###
 #### fields ####
