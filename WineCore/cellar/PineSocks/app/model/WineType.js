@@ -1,5 +1,6 @@
 Ext.define('WineCellar.model.WineType', {
 	extend: 'Ext.data.Model',
+	requires:['WineCellar.store.reader.String'],
 	fields: [
 		{name:'winetype', type:'string'}
 	],
@@ -8,7 +9,7 @@ Ext.define('WineCellar.model.WineType', {
 		url:"../truth/winetype",
 		noCache:false,
 		reader: {
-			type: 'json',
+			type: 'string',
 			root: '/'
 		}
 	}
