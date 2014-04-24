@@ -13,10 +13,10 @@ import wine_types
 prelude = "/truth"
 
 count = {
-    'winery': 3,
-    'wine': 15,
+    'winery': 5,
+    'wine': 25,
     'cellar': 2,
-    'winebottles': 25,
+    'winebottles': 45,
     'userwine': 12,
     'tastings': 20
 }

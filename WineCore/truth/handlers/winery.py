@@ -52,6 +52,9 @@ class WineryBaseHandler(webapp2.RequestHandler):
                 verified = True
             json_response(self, Winery.verified_query(verified))
             return
+        if 'q' in get and get['q'] != '':
+            json_response(self, Winery.search(get['q']))
+            return
 
         #if no params, return entire list.
         json_response(self, Winery.all_query())

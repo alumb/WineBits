@@ -502,3 +502,14 @@ class Winery(BaseModel):
         qry = Winery.query(Winery.location_fuzzy is not None)
         results = qry.fetch(MAX_RESULTS)
         return [x.location_fuzzy for x in results]
+
+    @staticmethod
+    def search(query):
+
+        query = "partial_name = " + query
+
+        winery_index = search.Index(name="wineries")
+        winery_query = search.Query(query_string=query)
+        winery_results = winery_index.search(winery_query)
+
+        return [ndb.Key(Winery, int(x.doc_id)).get() for x in winery_results]

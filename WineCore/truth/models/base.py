@@ -51,10 +51,14 @@ class BaseModel(ndb.Model):
 
         """
         chunks = []
-        words = string.split(" ")
-        for word in words:
-            for i in range(1, len(word) + 1):
-                chunks.append(word[0:i])
+        for word in string.split():
+            j = 1
+            while True:
+                for i in range(len(word) - j + 1):
+                    chunks.append(word[i:i + j])
+                if j == len(word):
+                    break
+                j += 1
         return " ".join(chunks)
 
     @staticmethod
